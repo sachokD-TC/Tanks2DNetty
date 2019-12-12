@@ -109,9 +109,7 @@ public class Bomb {
 
 
     public void startBombThread(boolean chekCollision) {
-
         new BombShotThread(chekCollision).start();
-
     }
 
     private class BombShotThread extends Thread {

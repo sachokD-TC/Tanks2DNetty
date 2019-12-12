@@ -18,7 +18,7 @@ public class ClientGUI extends JFrame implements WindowListener {
     public final JTextField nameTextField;
     private final JLabel chatTitleLabel;
     private final JTextField chatMessageTextField;
-    public final JTextArea chatTextArea;
+    private final JTextArea chatTextArea;
     private final JButton sendButton;
     private JLabel ipaddressLabel;
     private JLabel portLabel;
@@ -35,7 +35,6 @@ public class ClientGUI extends JFrame implements WindowListener {
     private static int score;
 
     int width = 790, height = 580;
-    public boolean isRunning = true;
     public GameBoardPanel boardPanel;
 
     public ClientGUI() {

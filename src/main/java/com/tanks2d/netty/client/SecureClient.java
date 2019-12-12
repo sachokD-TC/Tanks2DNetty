@@ -145,9 +145,7 @@ public final class SecureClient {
     public void shot(String msg) {
         String[] params = msg.split(",");
         String name = params[1];
-        if (clientGUI.clientTank.getTankName().equals(name)) {
-            clientGUI.boardPanel.getTank(name).shot();
-        }
+        clientGUI.boardPanel.getTank(name).shot();
     }
 
     public void sendMessageToChat(String msg) {
