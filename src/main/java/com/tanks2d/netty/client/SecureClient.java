@@ -151,9 +151,9 @@ public final class SecureClient {
     }
 
     public void sendMessageToChat(String msg) {
-        if (!msg.contains("[you]")) {
+        if (!msg.contains("#" + clientGUI.clientTank.getTankName() + ":")) {
             msg = msg.substring(msg.lastIndexOf("#"));
-            clientGUI.chatTextArea.append(msg + "\n");
+            clientGUI.sendMessageToServerChat(msg + "\n");
         }
     }
 }

@@ -5,6 +5,8 @@ import com.tanks2d.netty.client.entity.Tank;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -22,13 +24,9 @@ public class ClientGUI extends JFrame implements WindowListener {
     private JLabel portLabel;
     private JScrollPane chatScrollPane;
     private static JLabel scoreLabel;
-
     private JTextField ipaddressText;
     private JTextField portText;
-
     private JButton registerButton;
-
-
     private JPanel registerPanel;
     public static JPanel gameStatusPanel;
     private SecureClient client;
@@ -79,7 +77,7 @@ public class ClientGUI extends JFrame implements WindowListener {
 
         registerButton = new JButton("Register");
         registerButton.setBounds(60, 100, 90, 25);
-        registerButton.addActionListener(e-> registerAction());
+        registerButton.addActionListener(e -> registerAction());
         registerButton.setFocusable(true);
 
 
@@ -102,16 +100,32 @@ public class ClientGUI extends JFrame implements WindowListener {
         chatMessageTextField.setEnabled(false);
 
         chatTextArea = new JTextArea();
-        chatTextArea.setBounds(10, 150, 150, 100);
-        chatTextArea.setBorder(BorderFactory.createLoweredBevelBorder());
         chatTextArea.setEditable(false);
-        chatScrollPane = new JScrollPane(chatMessageTextField);
+        chatScrollPane = new JScrollPane(chatTextArea);
+        chatScrollPane.setBorder(BorderFactory.createLoweredBevelBorder());
         chatScrollPane.setBounds(10, 150, 150, 100);
 
         sendButton = new JButton(SEND_MESSAGE);
         sendButton.setBounds(10, 270, 120, 25);
         sendButton.setFocusable(true);
-        sendButton.addActionListener(e -> sendMessageToServerChat());
+        sendButton.addActionListener(e -> sendMessageToChatLocal(chatMessageTextField.getText()));
+
+        chatMessageTextField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                sendMessageFromKeyboard(chatMessageTextField.getText(), keyEvent);
+            }
+
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+
+            }
+        });
 
         gameStatusPanel.add(scoreLabel);
         gameStatusPanel.add(nameLabel);
@@ -126,8 +140,9 @@ public class ClientGUI extends JFrame implements WindowListener {
         setVisible(true);
     }
 
+
     private void registerAction() {
-        if(nameTextField.getText().equals("")){
+        if (nameTextField.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Please enter your name", "Tanks 2D Multiplayer Game", JOptionPane.INFORMATION_MESSAGE);
         } else {
             nameLabel.setText(NAME_LABEL_TEXT + nameTextField.getText());
@@ -135,7 +150,7 @@ public class ClientGUI extends JFrame implements WindowListener {
             chatMessageTextField.setEnabled(true);
             registerButton.setEnabled(false);
 
-            if(SecureClient.checkConnection(ipaddressText.getText(), Integer.parseInt(portText.getText()))) {
+            if (SecureClient.checkConnection(ipaddressText.getText(), Integer.parseInt(portText.getText()))) {
                 client = SecureClient.getClient(ipaddressText.getText(), Integer.parseInt(portText.getText()), this);
                 clientTank = new Tank();
                 clientTank.setTankName(nameTextField.getText());
@@ -151,23 +166,35 @@ public class ClientGUI extends JFrame implements WindowListener {
                 boardPanel.setFocusable(true);
                 boardPanel.grabFocus();
             } else {
-                   JOptionPane.showMessageDialog(this, "The Server is not running, try again later!", "Tanks 2D Multiplayer Game", JOptionPane.INFORMATION_MESSAGE);
-                   System.out.println("The Server is not running!");
-                   registerButton.setEnabled(true);
+                JOptionPane.showMessageDialog(this, "The Server is not running, try again later!", "Tanks 2D Multiplayer Game", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("The Server is not running!");
+                registerButton.setEnabled(true);
             }
         }
     }
 
-    private void sendMessageToServerChat() {
-        String messageText = chatMessageTextField.getText();
+    private void sendMessageFromKeyboard(String messageText, KeyEvent e) {
+        if (KeyEvent.VK_ENTER == e.getKeyCode())
+            sendMessageToChatLocal(messageText);
+    }
+
+
+    private void sendMessageToChatLocal(String messageText) {
         if (!"".equals(messageText)) {
             client.sendCommandToServer(nameTextField.getText() + ":" + chatMessageTextField.getText() + "\n");
-            chatTextArea.append("You: " + messageText + "\n");
+            messageText = "You: " + messageText + "\n";
+            sendMessageToServerChat(messageText);
             chatMessageTextField.setText("");
+        }
+    }
+
+    public void sendMessageToServerChat(String messageText) {
+        if (!"".equals(messageText)) {
+            chatTextArea.append(messageText);
+            chatTextArea.setCaretPosition(chatTextArea.getDocument().getLength());
             boardPanel.setFocusable(true);
             boardPanel.setRequestFocusEnabled(true);
             boardPanel.grabFocus();
-            boardPanel.repaint();
         }
     }
 

@@ -1,6 +1,5 @@
 package com.tanks2d.netty.client.gui;
 
-import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.control.InputManager;
 import com.tanks2d.netty.client.entity.Tank;
 
@@ -8,19 +7,13 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sun.javafx.scene.control.skin.Utils.getResource;
-
 
 public class GameBoardPanel extends JPanel {
 
-    /**
-     * Creates a new instance of com.tanks2d.client.GameBoardPanel
-     */
     private Tank tank;
     private int width = 609;
     private int height = 523;

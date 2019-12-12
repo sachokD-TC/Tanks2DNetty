@@ -3,14 +3,10 @@ package com.tanks2d.netty.client.entity;
 import com.tanks2d.netty.client.gui.GameBoardPanel;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-
-import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
 public class Tank {
 
