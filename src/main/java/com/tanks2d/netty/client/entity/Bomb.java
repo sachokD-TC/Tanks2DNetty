@@ -5,14 +5,13 @@ import com.tanks2d.netty.client.gui.ClientGUI;
 import com.tanks2d.netty.client.gui.GameBoardPanel;
 import com.tanks2d.netty.client.sound.SimpleSoundPlayer;
 
-import javax.swing.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 /*
  * com.tanks2d.client.Bomb.java
  *
@@ -41,19 +40,23 @@ public class Bomb {
     private float velocityX = 0.05f, velocityY = 0.05f;
 
     public Bomb(int x, int y, int direction) {
-        final SimpleSoundPlayer sound_boom = new SimpleSoundPlayer("boom.wav");
-        final InputStream stream_boom = new ByteArrayInputStream(sound_boom.getSamples());
+        final SimpleSoundPlayer soundBoom = new SimpleSoundPlayer("/sounds/boom.wav");
+        final InputStream streamBoom = new ByteArrayInputStream(soundBoom.getSamples());
         xPosi = x;
         yPosi = y;
         this.direction = direction;
         stop = false;
-        bombImg = new ImageIcon("Images/bomb.png").getImage();
+        try {
+            bombImg = ImageIO.read(getClass().getResource("/Images/bomb.PNG"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         bombBuffImage = new BufferedImage(bombImg.getWidth(null), bombImg.getHeight(null), BufferedImage.TYPE_INT_RGB);
         bombBuffImage.createGraphics().drawImage(bombImg, 0, 0, null);
         Thread t = new Thread(new Runnable() {
             public void run() {
-                sound_boom.play(stream_boom);
+                soundBoom.play(streamBoom);
             }
         });
         t.start();

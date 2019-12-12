@@ -4,12 +4,16 @@ import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.control.InputManager;
 import com.tanks2d.netty.client.entity.Tank;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
 
 public class GameBoardPanel extends JPanel {
@@ -42,7 +46,11 @@ public class GameBoardPanel extends JPanel {
 
         g.setColor(Color.GREEN);
         g.fillRect(70, 50, getWidth() - 100, getHeight());
-        g.drawImage(new ImageIcon("Images/bg.jpg").getImage(), 70, 50, null);
+        try {
+            g.drawImage(ImageIO.read(getClass().getResourceAsStream("/Images/bg.JPG")), 70, 50, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Comic Sans MS", Font.BOLD, 25));
         g.drawString("Tanks 2D Multiplayers Game", 255, 30);

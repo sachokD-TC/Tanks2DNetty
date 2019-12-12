@@ -20,6 +20,7 @@ public class ClientGUI extends JFrame implements WindowListener {
     private final JButton sendButton;
     private JLabel ipaddressLabel;
     private JLabel portLabel;
+    private JScrollPane chatScrollPane;
     private static JLabel scoreLabel;
 
     private JTextField ipaddressText;
@@ -104,6 +105,8 @@ public class ClientGUI extends JFrame implements WindowListener {
         chatTextArea.setBounds(10, 150, 150, 100);
         chatTextArea.setBorder(BorderFactory.createLoweredBevelBorder());
         chatTextArea.setEditable(false);
+        chatScrollPane = new JScrollPane(chatMessageTextField);
+        chatScrollPane.setBounds(10, 150, 150, 100);
 
         sendButton = new JButton(SEND_MESSAGE);
         sendButton.setBounds(10, 270, 120, 25);
@@ -115,7 +118,7 @@ public class ClientGUI extends JFrame implements WindowListener {
         gameStatusPanel.add(nameTextField);
         gameStatusPanel.add(chatTitleLabel);
         gameStatusPanel.add(chatMessageTextField);
-        gameStatusPanel.add(chatTextArea);
+        gameStatusPanel.add(chatScrollPane);
         gameStatusPanel.add(sendButton);
 
         getContentPane().add(registerPanel);

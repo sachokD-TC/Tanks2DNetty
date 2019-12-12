@@ -2,11 +2,15 @@ package com.tanks2d.netty.client.entity;
 
 import com.tanks2d.netty.client.gui.GameBoardPanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
 public class Tank {
 
@@ -47,7 +51,11 @@ public class Tank {
     public void loadImage(int a) {
         tankImg = new Image[4];
         for (int i = a; i < tankImg.length + a; i++) {
-            tankImg[i - a] = new ImageIcon("Images/" + i + ".png").getImage();
+            try {
+                tankImg[i - a] = ImageIO.read(getClass().getResource("/Images/" + i + ".PNG"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         ImageBuff = new BufferedImage(tankImg[direction - 1].getWidth(null), tankImg[direction - 1].getHeight(null), BufferedImage.TYPE_INT_RGB);

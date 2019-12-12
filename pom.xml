@@ -13,16 +13,34 @@
             <build>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <classifier>server</classifier>
-                            <excludes>**/client/**</excludes>
-                            <archive>
-                                <manifest>
-                                    <mainClass>com.tanks2d.netty.server.gui.ServerGUI</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>2.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>make-executable-jar-with-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>Tanks2D-server</finalName>
+                                    <descriptors>
+                                        <descriptor>src/assembly/jar-with-deps-with-exclude-for-server.xml</descriptor>
+                                    </descriptors>
+                                    <archive>
+                                        <manifest>
+                                            <addClasspath>true</addClasspath>
+                                            <mainClass>com.tanks2d.netty.server.gui.ServerGUI</mainClass>
+                                        </manifest>
+                                    </archive>
+                                    <descriptorRefs>
+                                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                                    </descriptorRefs>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -32,22 +50,49 @@
             <build>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <classifier>client</classifier>
-                            <excludes>**/server/**</excludes>
-                            <archive>
-                                <manifest>
-                                    <mainClass>com.tanks2d.netty.client.gui.ClientGUI</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>2.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>make-executable-jar-with-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>Tanks2D-client</finalName>
+                                    <descriptors>
+                                        <descriptor>src/assembly/jar-with-deps-with-exclude-for-client.xml</descriptor>
+                                    </descriptors>
+                                    <archive>
+                                        <manifest>
+                                            <addClasspath>true</addClasspath>
+                                            <mainClass>com.tanks2d.netty.client.gui.ClientGUI</mainClass>
+                                        </manifest>
+                                    </archive>
+                                    <descriptorRefs>
+                                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                                    </descriptorRefs>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/**</include>
+                    <include>**/*.wav</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -57,21 +102,8 @@
                     <target>8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
