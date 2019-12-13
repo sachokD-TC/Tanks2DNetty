@@ -13,16 +13,15 @@ public class InputManager implements KeyListener {
     private final int DOWN = 40;
     private static int status = 0;
     private boolean firstMove = true;
-
-    private Tank tank;
+    private Tank clientTank;
     private SecureClient client;
 
     /**
      * Creates a new instance of com.tanks2d.client.InputManager
      */
-    public InputManager(Tank tank) {
+    public InputManager(Tank clientTank) {
         this.client = SecureClient.getClient();
-        this.tank = tank;
+        this.clientTank = clientTank;
     }
 
     public void keyTyped(KeyEvent e) {
@@ -30,60 +29,68 @@ public class InputManager implements KeyListener {
 
     public void keyPressed(KeyEvent e) {
         if(firstMove){
-            client.sendCommandToServer("Register," + tank.getTankName() + "," + tank.getXposition() + "," + tank.getYposition() + "," + tank.getDirection());
+            client.sendCommandToServer("Register," + clientTank.getTankName() + "," + clientTank.getXposition() + "," + clientTank.getYposition() + "," + clientTank.getDirection());
             firstMove = false;
         }
 
         if (e.getKeyCode() == LEFT) {
-            if (tank.getDirection() == 1 | tank.getDirection() == 3) {
-                tank.moveLeft();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
-            } else if (tank.getDirection() == 4) {
-                tank.moveLeft();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
+            if (clientTank.getDirection() == 1 | clientTank.getDirection() == 3) {
+                clientTank.moveLeft();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
+            } else if (clientTank.getDirection() == 4) {
+                clientTank.moveLeft();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             }
         } else if (e.getKeyCode() == RIGHT) {
-            if (tank.getDirection() == 1 | tank.getDirection() == 3) {
-                tank.moveRight();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
+            if (clientTank.getDirection() == 1 | clientTank.getDirection() == 3) {
+                clientTank.moveRight();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
 
-            } else if (tank.getDirection() == 2) {
-                tank.moveRight();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
+            } else if (clientTank.getDirection() == 2) {
+                clientTank.moveRight();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
 
             }
         } else if (e.getKeyCode() == UP) {
-            if (tank.getDirection() == 2 | tank.getDirection() == 4) {
-                tank.moveForward();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
-            } else if (tank.getDirection() == 1) {
-                tank.moveForward();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
+            if (clientTank.getDirection() == 2 | clientTank.getDirection() == 4) {
+                clientTank.moveForward();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
+            } else if (clientTank.getDirection() == 1) {
+                clientTank.moveForward();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             }
         } else if (e.getKeyCode() == DOWN) {
-            if (tank.getDirection() == 2 | tank.getDirection() == 4) {
-                tank.moveBackward();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
-            } else if (tank.getDirection() == 3) {
-                tank.moveBackward();
-                client.sendCommandToServer("Update," + tank.getXposition() + "," +
-                        tank.getYposition() + "," + tank.getTankName() + "," + tank.getDirection());
+            if (clientTank.getDirection() == 2 | clientTank.getDirection() == 4) {
+                clientTank.moveBackward();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
+            } else if (clientTank.getDirection() == 3) {
+                clientTank.moveBackward();
+                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
+                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
 
             }
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            client.sendCommandToServer("Shot," + tank.getTankName());
-            tank.shotFromKeyboard();
+            client.sendCommandToServer("Shot," + clientTank.getTankName());
+            clientTank.shotFromKeyboard();
         }
     }
 
     public void keyReleased(KeyEvent e) {
+    }
+
+    public void setFirstMove(boolean firstMove) {
+        this.firstMove = firstMove;
+    }
+
+    public void setClientTank(Tank clientTank) {
+        this.clientTank = clientTank;
     }
 
 }

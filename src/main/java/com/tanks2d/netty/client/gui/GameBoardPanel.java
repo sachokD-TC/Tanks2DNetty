@@ -14,18 +14,19 @@ import java.util.Map;
 
 public class GameBoardPanel extends JPanel {
 
-    private Tank tank;
+    private Tank clientTank;
     private int width = 609;
     private int height = 523;
     private static Map<String, Tank> tanks;
     private boolean gameStatus;
-
-    public GameBoardPanel(Tank tank, boolean gameStatus) {
-        this.tank = tank;
+    private InputManager inputManager;
+    public GameBoardPanel(Tank clientTank, boolean gameStatus) {
+        this.clientTank = clientTank;
         this.gameStatus = gameStatus;
         setSize(width, height);
         setBounds(-50, 0, width, height);
-        addKeyListener(new InputManager(tank));
+        this.inputManager = new InputManager(clientTank);
+        addKeyListener(inputManager);
         setFocusable(true);
         tanks = new HashMap<>();
     }
@@ -48,17 +49,17 @@ public class GameBoardPanel extends JPanel {
         g.setFont(new Font("Comic Sans MS", Font.BOLD, 25));
         g.drawString("Tanks 2D Multiplayers Game", 255, 30);
         if (gameStatus) {
-            g.drawImage(tank.getBuffImage(), tank.getXposition(), tank.getYposition(), this);
+            g.drawImage(clientTank.getBuffImage(), clientTank.getXposition(), clientTank.getYposition(), this);
             for (int j = 0; j < 1000; j++) {
-                if (tank.getBomb()[j] != null) {
-                    if (tank.getBomb()[j].stop == false) {
-                        g.drawImage(tank.getBomb()[j].getBomBufferdImg(), tank.getBomb()[j].getPosiX(), tank.getBomb()[j].getPosiY(), this);
+                if (clientTank.getBomb()[j] != null) {
+                    if (clientTank.getBomb()[j].stop == false) {
+                        g.drawImage(clientTank.getBomb()[j].getBomBufferdImg(), clientTank.getBomb()[j].getPosiX(), clientTank.getBomb()[j].getPosiY(), this);
                     }
                 }
             }
             Collection<Tank> tanksOnBoard = tanks.values();
             for (Tank tank : tanksOnBoard) {
-                if (!tank.getTankName().equals(this.tank.getTankName())) {
+                if (!tank.getTankName().equals(this.clientTank.getTankName())) {
                     g.drawImage(tank.getBuffImage(), tank.getXposition(), tank.getYposition(), this);
                     for (int j = 0; j < 1000; j++) {
                         if (tank.getBomb()[j] != null) {
@@ -78,16 +79,20 @@ public class GameBoardPanel extends JPanel {
     }
 
     public void removeTank(String tankName) {
-        if (tankName.equals(tank.getTankName())) {
+        tanks.remove(tankName);
+        if (tankName.equals(clientTank.getTankName())) {
             int response = JOptionPane.showConfirmDialog(this, "Sorry you were killed, would you like to try again?", "Tanks 2D Multiplayer Game!", JOptionPane.YES_NO_OPTION);
-            tanks.remove(tank);
-        } else {
-            tanks.remove(tankName);
+            if (response == JOptionPane.YES_OPTION) {
+                this.clientTank = new Tank();
+                this.clientTank.setTankName(tankName);
+                inputManager.setFirstMove(true);
+                inputManager.setClientTank(clientTank);
+            }
         }
     }
 
     public void updateTank(String name, int x, int y, int direction) {
-        if (!name.equals(this.tank.getTankName())) {
+        if (!name.equals(this.clientTank.getTankName())) {
             Tank tank = tanks.get(name);
             tank.setXpoistion(x);
             tank.setYposition(y);

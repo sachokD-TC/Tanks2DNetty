@@ -140,7 +140,7 @@ public class ClientGUI extends JFrame implements WindowListener {
     }
 
 
-    private void registerAction() {
+    public void registerAction() {
         if (nameTextField.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Please enter your name", "Tanks 2D Multiplayer Game", JOptionPane.INFORMATION_MESSAGE);
         } else {

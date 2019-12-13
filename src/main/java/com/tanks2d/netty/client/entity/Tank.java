@@ -33,7 +33,6 @@ public class Tank {
             posiY = (int) (Math.random() * height);
         }
         loadImage(4);
-
     }
 
     public Tank(int x, int y, int dir, String name) {

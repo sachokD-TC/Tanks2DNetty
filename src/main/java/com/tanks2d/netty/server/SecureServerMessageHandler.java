@@ -55,7 +55,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                         roomId++;
                     } else {
                         channels = channelsMap.get(roomId);
-                        if (channels.size()-1 == numberOfTanks) {
+                        if (channels.size() - 1 == numberOfTanks) {
                             roomId++;
                             channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
                             ctx.writeAndFlush(roomId + "#new room opened \n");
@@ -80,11 +80,16 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                     name = getNameFromRegisterCommand(msg, channelId);
                 namesMap.put(ctx.channel().id().asLongText(), name);
             }
+            if (msg.contains("Remove")) {
+                channelsMap.remove(ctx.channel());
+                namesMap.remove(channelId);
+            }
             sendMessageToRoom(roomId, msg, name, ctx);
-            // Close the connection if the client has sent 'bye'.
             if ("Exit".equals(msg.toLowerCase().substring(msg.indexOf("#")))) {
                 sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
                 ctx.close();
+                channelsMap.remove(ctx.channel());
+                namesMap.remove(channelId);
             }
         }
     }
@@ -101,11 +106,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
     private void sendMessageToRoom(Integer roomId, String message, String name, ChannelHandlerContext ctx) {
         ChannelGroup channels = channelsMap.get(roomId);
         for (Channel c : channels) {
-            if (c != ctx.channel()) {
-                c.writeAndFlush("[" + name + "]" + message + "\n");
-            } else {
-                c.writeAndFlush("[you] " + message + '\n');
-            }
+            c.writeAndFlush("[" + name + "]" + message + "\n");
         }
     }
 
