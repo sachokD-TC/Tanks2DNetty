@@ -61,10 +61,12 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                             ctx.writeAndFlush(roomId + "#new room opened \n");
                         }
                     }
-                    channels.add(ctx.channel());
-                    ctx.writeAndFlush(roomId + "#player joined \n");
-                    namesMap.put(ctx.channel().id().asLongText(), "");
-                    channelsMap.put(roomId, channels);
+                    if(!channels.contains(ctx.channel())) {
+                        channels.add(ctx.channel());
+                        ctx.writeAndFlush(roomId + "#player joined \n");
+                        namesMap.put(ctx.channel().id().asLongText(), "");
+                        channelsMap.put(roomId, channels);
+                    }
                 });
     }
 

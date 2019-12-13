@@ -1,5 +1,6 @@
 package com.tanks2d.netty.client.gui;
 
+import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.control.InputManager;
 import com.tanks2d.netty.client.entity.Tank;
 
@@ -87,6 +88,9 @@ public class GameBoardPanel extends JPanel {
                 this.clientTank.setTankName(tankName);
                 inputManager.setFirstMove(true);
                 inputManager.setClientTank(clientTank);
+            } else {
+                System.exit(0);
+                SecureClient.getClient().sendCommandToServer("Exit," + clientTank.getTankName());
             }
         }
     }
