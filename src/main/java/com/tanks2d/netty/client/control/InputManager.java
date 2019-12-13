@@ -28,57 +28,40 @@ public class InputManager implements KeyListener {
     }
 
     public void keyPressed(KeyEvent e) {
-        if(firstMove){
+        if (firstMove) {
             client.sendCommandToServer("Register," + clientTank.getTankName() + "," + clientTank.getXposition() + "," + clientTank.getYposition() + "," + clientTank.getDirection());
             firstMove = false;
         }
-
         if (e.getKeyCode() == LEFT) {
             if (clientTank.getDirection() == 1 | clientTank.getDirection() == 3) {
                 clientTank.moveLeft();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             } else if (clientTank.getDirection() == 4) {
                 clientTank.moveLeft();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             }
         } else if (e.getKeyCode() == RIGHT) {
             if (clientTank.getDirection() == 1 | clientTank.getDirection() == 3) {
                 clientTank.moveRight();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
-
             } else if (clientTank.getDirection() == 2) {
                 clientTank.moveRight();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
-
             }
         } else if (e.getKeyCode() == UP) {
             if (clientTank.getDirection() == 2 | clientTank.getDirection() == 4) {
-                clientTank.moveForward();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             } else if (clientTank.getDirection() == 1) {
                 clientTank.moveForward();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             }
         } else if (e.getKeyCode() == DOWN) {
             if (clientTank.getDirection() == 2 | clientTank.getDirection() == 4) {
                 clientTank.moveBackward();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
             } else if (clientTank.getDirection() == 3) {
                 clientTank.moveBackward();
-                client.sendCommandToServer("Update," + clientTank.getXposition() + "," +
-                        clientTank.getYposition() + "," + clientTank.getTankName() + "," + clientTank.getDirection());
-
             }
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             client.sendCommandToServer("Shot," + clientTank.getTankName());
             clientTank.shotFromKeyboard();
+        }
+        if (e.getKeyCode() == RIGHT || e.getKeyCode() == LEFT || e.getKeyCode() == UP || e.getKeyCode() == DOWN) {
+            client.sendCommandToServer("Update," + clientTank.getTankName() + "," + clientTank.getXposition() + "," +
+                    clientTank.getYposition() + "," + clientTank.getDirection());
         }
     }
 

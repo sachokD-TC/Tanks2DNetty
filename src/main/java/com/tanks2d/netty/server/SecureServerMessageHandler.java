@@ -61,7 +61,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                             ctx.writeAndFlush(roomId + "#new room opened \n");
                         }
                     }
-                    if(!channels.contains(ctx.channel())) {
+                    if (!channels.contains(ctx.channel())) {
                         channels.add(ctx.channel());
                         ctx.writeAndFlush(roomId + "#player joined \n");
                         namesMap.put(ctx.channel().id().asLongText(), "");
@@ -82,11 +82,11 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                     name = getNameFromRegisterCommand(msg, channelId);
                 namesMap.put(ctx.channel().id().asLongText(), name);
             }
+            sendMessageToRoom(roomId, msg, name, ctx);
             if (msg.contains("Remove")) {
                 channelsMap.remove(ctx.channel());
                 namesMap.remove(channelId);
             }
-            sendMessageToRoom(roomId, msg, name, ctx);
             if ("Exit".equals(msg.toLowerCase().substring(msg.indexOf("#")))) {
                 sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
                 ctx.close();
@@ -107,8 +107,11 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
 
     private void sendMessageToRoom(Integer roomId, String message, String name, ChannelHandlerContext ctx) {
         ChannelGroup channels = channelsMap.get(roomId);
+        System.out.println("command - " + message + ", name - " + name);
         for (Channel c : channels) {
-            c.writeAndFlush("[" + name + "]" + message + "\n");
+            if (namesMap.get(c.id().asLongText()) != null && !namesMap.get(c.id().asLongText()).equals(name)) {
+                c.writeAndFlush("[" + name + "]" + message + "\n");
+            }
         }
     }
 

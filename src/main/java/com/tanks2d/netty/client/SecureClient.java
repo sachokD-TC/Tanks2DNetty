@@ -96,9 +96,9 @@ public final class SecureClient {
 
     public void updateTank(String command) {
         String[] params = command.split(",");
-        String name = params[3];
-        int x = Integer.parseInt(params[1]);
-        int y = Integer.parseInt(params[2]);
+        String name = params[1];
+        int x = Integer.parseInt(params[2]);
+        int y = Integer.parseInt(params[3]);
         int direction = Integer.parseInt(params[4]);
         clientGUI.boardPanel.updateTank(name, x, y, direction);
     }

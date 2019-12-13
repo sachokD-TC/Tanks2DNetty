@@ -41,7 +41,7 @@ public class ServerGUI extends JFrame {
         portLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
         portLabel.setBounds(20, 40, 200, 25);
 
-        portTextField = new JTextField();
+        portTextField = new JTextField("8992");
         portTextField.setBounds(150, 40, 80, 25);
 
         numberOfTanksPerRoomLabel = new JLabel("Number of Tanks per room");

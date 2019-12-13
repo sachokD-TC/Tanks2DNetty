@@ -21,6 +21,7 @@ public class GameBoardPanel extends JPanel {
     private static Map<String, Tank> tanks;
     private boolean gameStatus;
     private InputManager inputManager;
+
     public GameBoardPanel(Tank clientTank, boolean gameStatus) {
         this.clientTank = clientTank;
         this.gameStatus = gameStatus;
@@ -96,12 +97,17 @@ public class GameBoardPanel extends JPanel {
     }
 
     public void updateTank(String name, int x, int y, int direction) {
-        if (!name.equals(this.clientTank.getTankName())) {
-            Tank tank = tanks.get(name);
-            tank.setXpoistion(x);
-            tank.setYposition(y);
-            tank.setDirection(direction);
-            repaint();
+        if (tanks.get(name) == null) {
+            Tank tank = new Tank(x, y, direction, name);
+            tanks.put(name, tank);
+        } else {
+            if (!name.equals(this.clientTank.getTankName())) {
+                Tank tank = tanks.get(name);
+                tank.setXpoistion(x);
+                tank.setYposition(y);
+                tank.setDirection(direction);
+                repaint();
+            }
         }
     }
 
