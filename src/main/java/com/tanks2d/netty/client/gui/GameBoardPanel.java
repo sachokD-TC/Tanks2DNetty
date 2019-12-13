@@ -89,8 +89,8 @@ public class GameBoardPanel extends JPanel {
                 inputManager.setFirstMove(true);
                 inputManager.setClientTank(clientTank);
             } else {
-                System.exit(0);
                 SecureClient.getClient().sendCommandToServer("Exit," + clientTank.getTankName());
+                System.exit(0);
             }
         }
     }
