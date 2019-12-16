@@ -149,7 +149,7 @@ public final class SecureClient {
     }
 
     public void sendMessageToChat(String msg) {
-        if (!msg.contains("#" + clientGUI.clientTank.getTankName() + ":")) {
+        if (!msg.contains("#" + clientGUI.getClientTank().getTankName() + ":")) {
             msg = msg.substring(msg.lastIndexOf("#"));
             clientGUI.sendMessageToServerChat(msg + "\n");
         }

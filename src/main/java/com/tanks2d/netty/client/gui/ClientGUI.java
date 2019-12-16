@@ -9,13 +9,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Random;
 
-public class ClientGUI extends JFrame implements WindowListener {
+public class ClientGUI extends JFrame {
 
     private static final String NAME_LABEL_TEXT = "Name:";
     private static final String SEND_MESSAGE = "Send message";
     private final JLabel nameLabel;
-    public final JTextField nameTextField;
+    private final JTextField nameTextField;
     private final JLabel chatTitleLabel;
     private final JTextField chatMessageTextField;
     private final JTextArea chatTextArea;
@@ -28,10 +29,11 @@ public class ClientGUI extends JFrame implements WindowListener {
     private JTextField portText;
     private JButton registerButton;
     private JPanel registerPanel;
-    public static JPanel gameStatusPanel;
+    private JPanel gameTipsPanel;
+    private JPanel gameTipsLabel;
+    private JPanel gameStatusPanel;
     private SecureClient client;
-    public Tank clientTank;
-
+    private Tank clientTank;
     private static int score;
 
     int width = 790, height = 580;
@@ -39,14 +41,50 @@ public class ClientGUI extends JFrame implements WindowListener {
 
     public ClientGUI() {
         score = 0;
-        setTitle("Multiclients Tanks Game");
-        setSize(width, height);
-        setLocation(60, 100);
-        getContentPane().setBackground(Color.BLACK);
+        this.setTitle("Multiclients Tanks Game");
+        this.setSize(width, height);
+        this.setLocation(60, 100);
+        this.getContentPane().setBackground(Color.BLACK);
+        this.setLayout(null);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowListener() {
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(null);
-        addWindowListener(this);
+            @Override
+            public void windowOpened(WindowEvent windowEvent) {
+
+            }
+
+            public void windowClosing(WindowEvent e) {
+                ClientGUI.this.windowClosing(e);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent windowEvent) {
+
+            }
+
+        });
+
         registerPanel = new JPanel();
         registerPanel.setBackground(Color.YELLOW);
         registerPanel.setSize(200, 140);
@@ -58,6 +96,13 @@ public class ClientGUI extends JFrame implements WindowListener {
         gameStatusPanel.setSize(200, 300);
         gameStatusPanel.setBounds(560, 210, 200, 311);
         gameStatusPanel.setLayout(null);
+
+        gameTipsPanel = new JPanel();
+        gameTipsPanel.setBackground(Color.YELLOW);
+        gameTipsPanel.setSize(50, 780);
+        gameTipsPanel.setBounds(10, 10, 50, 780);
+        gameTipsPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+        gameTipsPanel.setLayout(null);
 
         ipaddressLabel = new JLabel("IP address: ");
         ipaddressLabel.setBounds(10, 25, 70, 25);
@@ -90,6 +135,8 @@ public class ClientGUI extends JFrame implements WindowListener {
         nameLabel.setBounds(10, 40, 100, 25);
         nameTextField = new JTextField();
         nameTextField.setBounds(10, 65, 150, 25);
+        nameTextField.setText("Name" + new Random().nextInt((100 - 1) + 1));
+
 
         chatTitleLabel = new JLabel("Chat room");
         chatTitleLabel.setBounds(10, 95, 150, 25);
@@ -136,6 +183,7 @@ public class ClientGUI extends JFrame implements WindowListener {
 
         getContentPane().add(registerPanel);
         getContentPane().add(gameStatusPanel);
+        getContentPane().add(gameTipsPanel);
         setVisible(true);
     }
 
@@ -197,40 +245,20 @@ public class ClientGUI extends JFrame implements WindowListener {
         }
     }
 
-    public static int getScore() {
-        return score;
-    }
-
-    public static void setScore(int scoreParametar) {
-        score += scoreParametar;
+    public static void setScore(int scoreInt) {
+        score += scoreInt;
         scoreLabel.setText("Score : " + score);
     }
 
-    public void windowOpened(WindowEvent e) {
-
-    }
-
     public void windowClosing(WindowEvent e) {
-        // int response=JOptionPane.showConfirmDialog(this,"Are you sure you want to exit ?","Tanks 2D Multiplayer Game!",JOptionPane.YES_NO_OPTION);
-        SecureClient.getClient().sendCommandToServer("Exit," + clientTank.getTankName());
+        int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to exit ?", "Tanks 2D Multiplayer Game!", JOptionPane.YES_NO_OPTION);
+        if (response == JOptionPane.YES_OPTION) {
+            if (SecureClient.getClient() != null)
+                SecureClient.getClient().sendCommandToServer("Exit," + clientTank.getTankName());
+            this.dispose();
+        }
     }
 
-
-    public void windowClosed(WindowEvent e) {
-
-    }
-
-    public void windowIconified(WindowEvent e) {
-    }
-
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-    public void windowActivated(WindowEvent e) {
-    }
-
-    public void windowDeactivated(WindowEvent e) {
-    }
 
     public SecureClient getClient() {
         return client;
@@ -238,5 +266,9 @@ public class ClientGUI extends JFrame implements WindowListener {
 
     public static void main(String[] args) {
         new ClientGUI();
+    }
+
+    public Tank getClientTank() {
+        return clientTank;
     }
 }

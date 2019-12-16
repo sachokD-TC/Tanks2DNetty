@@ -94,7 +94,6 @@ public class Bomb {
             y = tank.getYposition();
             if ((yPosi >= y && yPosi <= y + 43) && (xPosi >= x && xPosi <= x + 43)) {
                 ClientGUI.setScore(50);
-                ClientGUI.gameStatusPanel.repaint();
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ex) {
