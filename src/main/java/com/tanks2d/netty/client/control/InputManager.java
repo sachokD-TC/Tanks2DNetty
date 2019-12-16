@@ -29,7 +29,7 @@ public class InputManager implements KeyListener {
 
     public void keyPressed(KeyEvent e) {
         if (firstMove) {
-            client.sendCommandToServer(REGISTER + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER + clientTank.getYposition() + DELIMITER + clientTank.getDirection());
+            client.registerTank(REGISTER + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER + clientTank.getYposition() + DELIMITER + clientTank.getDirection());
             client.getClientGUI().setTipsText(TIP_PLAY_GAME_MESSAGE);
             firstMove = false;
         }

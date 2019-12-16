@@ -80,19 +80,16 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
             String channelId = ctx.channel().id().asLongText();
             if (namesMap.containsKey(channelId)) {
                 name = namesMap.get(channelId);
-                if (name.equals(""))
+                if (name.equals("")) {
                     name = getNameFromRegisterCommand(msg, channelId);
-                namesMap.put(ctx.channel().id().asLongText(), name);
-                sendMessageToRoom(roomId, msg, name, ctx);
-                if (msg.contains("Remove")) {
-                    channelsMap.remove(ctx.channel());
-                    namesMap.remove(channelId);
+                    namesMap.put(ctx.channel().id().asLongText(), name);
                 }
-                if (EXIT.equals(msg.toLowerCase().substring(msg.indexOf("#")))) {
+                sendMessageToRoom(roomId, msg, name, ctx);
+                if (msg.contains("Exit")) {
                     sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
-                    ctx.close();
                     channelsMap.remove(ctx.channel());
                     namesMap.remove(channelId);
+                    ctx.close();
                 }
             }
         }

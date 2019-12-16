@@ -109,7 +109,6 @@ public final class SecureClient {
     public void registerTank(String command) {
         String[] params = command.split(",");
         String name = params[1];
-        Integer roomId = Integer.parseInt(params[0].substring(1, params[0].indexOf("[")));
         int x = Integer.parseInt(params[2]);
         int y = Integer.parseInt(params[3]);
         int direction = Integer.parseInt(params[4]);
@@ -117,14 +116,14 @@ public final class SecureClient {
         if (!clientGUI.boardPanel.isTankOnBoard(name)) {
             clientGUI.boardPanel.registerNewTank(tank);
             clientGUI.boardPanel.repaint();
-            sendAllTanksOnBoard(roomId);
+            sendAllTanksOnBoard();
         }
     }
 
-    public void sendAllTanksOnBoard(Integer roomId) {
+    public void sendAllTanksOnBoard() {
         Collection<Tank> tanks = clientGUI.boardPanel.getTanks().values();
         for (Tank tank : tanks) {
-            String msg = roomId + ROOM_NUMBER_SIGN + REGISTER + DELIMITER;
+            String msg = REGISTER + DELIMITER;
             msg += tank.getTankName() + ",";
             msg += tank.getXposition() + ",";
             msg += tank.getYposition() + ",";

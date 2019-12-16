@@ -35,11 +35,11 @@ public class SecureClientMessageHandler extends SimpleChannelInboundHandler<Stri
         }
         System.out.println(msg);
         msg = msg.substring(msg.indexOf(ROOM_NUMBER_SIGN));
-        if (msg.contains(REGISTER)) SecureClient.getClient().registerTank(msg);
-        else if (msg.contains(UPDATE)) SecureClient.getClient().updateTank(msg);
+        if (msg.contains(UPDATE)) SecureClient.getClient().updateTank(msg);
         else if(msg.contains(REMOVE))SecureClient.getClient().removeTank(msg);
-        if (msg.contains(SHOT))  SecureClient.getClient().shot(msg);
-        if(msg.contains(CHAT_DELIMITER)) SecureClient.getClient().sendMessageToChat(msg);
+        else if(msg.contains(EXIT))SecureClient.getClient().removeTank(msg);
+        else if (msg.contains(SHOT))  SecureClient.getClient().shot(msg);
+        else if(msg.contains(CHAT_DELIMITER)) SecureClient.getClient().sendMessageToChat(msg);
     }
 
 
