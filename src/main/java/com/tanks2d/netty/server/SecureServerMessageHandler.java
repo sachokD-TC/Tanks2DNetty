@@ -29,6 +29,8 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
+
 /**
  * Handles a server-side channel.
  */
@@ -81,17 +83,17 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                 if (name.equals(""))
                     name = getNameFromRegisterCommand(msg, channelId);
                 namesMap.put(ctx.channel().id().asLongText(), name);
-            }
-            sendMessageToRoom(roomId, msg, name, ctx);
-            if (msg.contains("Remove")) {
-                channelsMap.remove(ctx.channel());
-                namesMap.remove(channelId);
-            }
-            if ("Exit".equals(msg.toLowerCase().substring(msg.indexOf("#")))) {
-                sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
-                ctx.close();
-                channelsMap.remove(ctx.channel());
-                namesMap.remove(channelId);
+                sendMessageToRoom(roomId, msg, name, ctx);
+                if (msg.contains("Remove")) {
+                    channelsMap.remove(ctx.channel());
+                    namesMap.remove(channelId);
+                }
+                if (EXIT.equals(msg.toLowerCase().substring(msg.indexOf("#")))) {
+                    sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
+                    ctx.close();
+                    channelsMap.remove(ctx.channel());
+                    namesMap.remove(channelId);
+                }
             }
         }
     }

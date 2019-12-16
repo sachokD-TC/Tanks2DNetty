@@ -177,9 +177,10 @@ public class Tank {
 
     public void shot() {
         bomb[curBomb] = new Bomb(this.getXposition(), this.getYposition(), direction);
-        bomb[curBomb].startBombThread(false);
-        curBomb++;
-
+        if (bomb[curBomb] != null) {
+            bomb[curBomb].startBombThread(false);
+            curBomb++;
+        }
     }
 
     public boolean checkCollision(int xP, int yP) {

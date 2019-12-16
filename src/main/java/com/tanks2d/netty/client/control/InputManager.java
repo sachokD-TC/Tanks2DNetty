@@ -6,12 +6,12 @@ import com.tanks2d.netty.client.entity.Tank;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import static com.tanks2d.netty.client.utils.constants.Commands.*;
+import static com.tanks2d.netty.client.utils.constants.Messages.TIP_CHAT_MESSAGE;
+import static com.tanks2d.netty.client.utils.constants.Messages.TIP_PLAY_GAME_MESSAGE;
+import static java.awt.event.KeyEvent.*;
+
 public class InputManager implements KeyListener {
-    private final int LEFT = 37;
-    private final int RIGHT = 39;
-    private final int UP = 38;
-    private final int DOWN = 40;
-    private static int status = 0;
     private boolean firstMove = true;
     private Tank clientTank;
     private SecureClient client;
@@ -29,39 +29,41 @@ public class InputManager implements KeyListener {
 
     public void keyPressed(KeyEvent e) {
         if (firstMove) {
-            client.sendCommandToServer("Register," + clientTank.getTankName() + "," + clientTank.getXposition() + "," + clientTank.getYposition() + "," + clientTank.getDirection());
+            client.sendCommandToServer(REGISTER + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER + clientTank.getYposition() + DELIMITER + clientTank.getDirection());
+            client.getClientGUI().setTipsText(TIP_PLAY_GAME_MESSAGE);
             firstMove = false;
         }
-        if (e.getKeyCode() == LEFT) {
+        int keyCode = e.getKeyCode();
+        if (keyCode == VK_LEFT) {
             if (clientTank.getDirection() == 1 | clientTank.getDirection() == 3) {
                 clientTank.moveLeft();
             } else if (clientTank.getDirection() == 4) {
                 clientTank.moveLeft();
             }
-        } else if (e.getKeyCode() == RIGHT) {
+        } else if (keyCode == VK_RIGHT) {
             if (clientTank.getDirection() == 1 | clientTank.getDirection() == 3) {
                 clientTank.moveRight();
             } else if (clientTank.getDirection() == 2) {
                 clientTank.moveRight();
             }
-        } else if (e.getKeyCode() == UP) {
-            if (clientTank.getDirection() == 2 | clientTank.getDirection() == 4) {
-            } else if (clientTank.getDirection() == 1) {
-                clientTank.moveForward();
-            }
-        } else if (e.getKeyCode() == DOWN) {
+        } else if (keyCode == VK_UP) {
+            clientTank.moveForward();
+        } else if (keyCode == VK_DOWN) {
             if (clientTank.getDirection() == 2 | clientTank.getDirection() == 4) {
                 clientTank.moveBackward();
             } else if (clientTank.getDirection() == 3) {
                 clientTank.moveBackward();
             }
-        } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            client.sendCommandToServer("Shot," + clientTank.getTankName());
+        } else if (keyCode == KeyEvent.VK_SPACE) {
+            client.sendCommandToServer(SHOT + DELIMITER + clientTank.getTankName());
             clientTank.shotFromKeyboard();
         }
-        if (e.getKeyCode() == RIGHT || e.getKeyCode() == LEFT || e.getKeyCode() == UP || e.getKeyCode() == DOWN) {
-            client.sendCommandToServer("Update," + clientTank.getTankName() + "," + clientTank.getXposition() + "," +
+        if (keyCode == VK_RIGHT || keyCode == VK_LEFT || keyCode == VK_UP || keyCode == VK_DOWN) {
+            client.sendCommandToServer(UPDATE + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER +
                     clientTank.getYposition() + "," + clientTank.getDirection());
+        } else if (keyCode == VK_F2) {
+            client.getClientGUI().activateChat();
+            client.getClientGUI().setTipsText(TIP_CHAT_MESSAGE);
         }
     }
 

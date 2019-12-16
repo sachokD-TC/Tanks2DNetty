@@ -12,6 +12,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
+import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
+import static com.tanks2d.netty.client.utils.constants.Messages.GAME_TITLE;
+import static com.tanks2d.netty.client.utils.constants.Messages.KILLED_QUESTION_MESSAGE;
+
 
 public class GameBoardPanel extends JPanel {
 
@@ -49,7 +54,7 @@ public class GameBoardPanel extends JPanel {
         }
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Comic Sans MS", Font.BOLD, 25));
-        g.drawString("Tanks 2D Multiplayers Game", 255, 30);
+        g.drawString(GAME_TITLE, 255, 30);
         if (gameStatus) {
             g.drawImage(clientTank.getBuffImage(), clientTank.getXposition(), clientTank.getYposition(), this);
             for (int j = 0; j < 1000; j++) {
@@ -83,14 +88,14 @@ public class GameBoardPanel extends JPanel {
     public void removeTank(String tankName) {
         tanks.remove(tankName);
         if (tankName.equals(clientTank.getTankName())) {
-            int response = JOptionPane.showConfirmDialog(this, "Sorry you were killed, would you like to try again?", "Tanks 2D Multiplayer Game!", JOptionPane.YES_NO_OPTION);
+            int response = JOptionPane.showConfirmDialog(this, KILLED_QUESTION_MESSAGE, GAME_TITLE, JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 this.clientTank = new Tank();
                 this.clientTank.setTankName(tankName);
                 inputManager.setFirstMove(true);
                 inputManager.setClientTank(clientTank);
             } else {
-                SecureClient.getClient().sendCommandToServer("Exit," + clientTank.getTankName());
+                SecureClient.getClient().sendCommandToServer(EXIT + DELIMITER + clientTank.getTankName());
                 System.exit(0);
             }
         }

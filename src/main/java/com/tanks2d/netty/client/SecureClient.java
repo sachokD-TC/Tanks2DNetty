@@ -17,6 +17,7 @@ package com.tanks2d.netty.client;
 
 import com.tanks2d.netty.client.entity.Tank;
 import com.tanks2d.netty.client.gui.ClientGUI;
+import com.tanks2d.netty.client.utils.constants.Commands;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -29,6 +30,8 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import javax.net.ssl.SSLException;
 import java.net.ConnectException;
 import java.util.Collection;
+
+import static com.tanks2d.netty.client.utils.constants.Commands.*;
 
 /**
  * Simple SSL chat client modified from {@link }.
@@ -121,7 +124,7 @@ public final class SecureClient {
     public void sendAllTanksOnBoard(Integer roomId) {
         Collection<Tank> tanks = clientGUI.boardPanel.getTanks().values();
         for (Tank tank : tanks) {
-            String msg = roomId + "#Register,";
+            String msg = roomId + ROOM_NUMBER_SIGN + REGISTER + DELIMITER;
             msg += tank.getTankName() + ",";
             msg += tank.getXposition() + ",";
             msg += tank.getYposition() + ",";
@@ -153,5 +156,9 @@ public final class SecureClient {
             msg = msg.substring(msg.lastIndexOf("#"));
             clientGUI.sendMessageToServerChat(msg + "\n");
         }
+    }
+
+    public ClientGUI getClientGUI() {
+        return clientGUI;
     }
 }

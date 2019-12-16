@@ -12,6 +12,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
+import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
+import static com.tanks2d.netty.client.utils.constants.Commands.REMOVE;
 /*
  * com.tanks2d.client.Bomb.java
  *
@@ -99,7 +102,7 @@ public class Bomb {
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
-                SecureClient.getClient().sendCommandToServer("Remove," + tank.getTankName());
+                SecureClient.getClient().sendCommandToServer(REMOVE  + DELIMITER + tank.getTankName());
                 return true;
             }
         }
