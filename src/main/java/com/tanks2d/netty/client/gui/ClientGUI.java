@@ -211,7 +211,7 @@ public class ClientGUI extends JFrame {
                 client = SecureClient.getClient(ipaddressText.getText(), Integer.parseInt(portText.getText()), this);
                 clientTank = new Tank();
                 clientTank.setTankName(nameTextField.getText());
-                boardPanel = new GameBoardPanel(clientTank, false);
+                boardPanel = new GameBoardPanel(clientTank, this);
                 getContentPane().add(boardPanel);
                 boardPanel.setGameStatus(true);
                 boardPanel.repaint();

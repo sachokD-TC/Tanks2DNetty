@@ -14,8 +14,7 @@ import java.util.Map;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
 import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
-import static com.tanks2d.netty.client.utils.constants.Messages.GAME_TITLE;
-import static com.tanks2d.netty.client.utils.constants.Messages.KILLED_QUESTION_MESSAGE;
+import static com.tanks2d.netty.client.utils.constants.Messages.*;
 
 
 public class GameBoardPanel extends JPanel {
@@ -26,10 +25,11 @@ public class GameBoardPanel extends JPanel {
     private static Map<String, Tank> tanks;
     private boolean gameStatus;
     private InputManager inputManager;
+    private ClientGUI clientGUI;
 
-    public GameBoardPanel(Tank clientTank, boolean gameStatus) {
+    public GameBoardPanel(Tank clientTank, ClientGUI clientGUI) {
         this.clientTank = clientTank;
-        this.gameStatus = gameStatus;
+        this.clientGUI = clientGUI;
         setSize(width, height);
         setBounds(-50, 0, width, height);
         this.inputManager = new InputManager(clientTank);
@@ -88,16 +88,11 @@ public class GameBoardPanel extends JPanel {
     public void removeTank(String tankName) {
         tanks.remove(tankName);
         if (tankName.equals(clientTank.getTankName())) {
-            int response = JOptionPane.showConfirmDialog(this.getParent(), KILLED_QUESTION_MESSAGE, GAME_TITLE, JOptionPane.YES_NO_OPTION);
-            if (response == JOptionPane.YES_OPTION) {
-                this.clientTank = new Tank();
-                this.clientTank.setTankName(tankName);
-                inputManager.setFirstMove(true);
-                inputManager.setClientTank(clientTank);
-            } else {
-                SecureClient.getClient().sendCommandToServer(EXIT + DELIMITER + clientTank.getTankName());
-                System.exit(0);
-            }
+            clientGUI.setTipsText(TIP_KILLED_MESSAGE);
+            this.clientTank = new Tank();
+            this.clientTank.setTankName(tankName);
+            inputManager.setFirstMove(true);
+            inputManager.setClientTank(clientTank);
         }
     }
 
