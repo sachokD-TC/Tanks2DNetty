@@ -88,7 +88,7 @@ public class GameBoardPanel extends JPanel {
     public void removeTank(String tankName) {
         tanks.remove(tankName);
         if (tankName.equals(clientTank.getTankName())) {
-            int response = JOptionPane.showConfirmDialog(this, KILLED_QUESTION_MESSAGE, GAME_TITLE, JOptionPane.YES_NO_OPTION);
+            int response = JOptionPane.showConfirmDialog(this.getParent().getParent(), KILLED_QUESTION_MESSAGE, GAME_TITLE, JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 this.clientTank = new Tank();
                 this.clientTank.setTankName(tankName);

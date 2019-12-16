@@ -15,18 +15,7 @@ import java.util.Collection;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
 import static com.tanks2d.netty.client.utils.constants.Commands.REMOVE;
-/*
- * com.tanks2d.client.Bomb.java
- *
- * Created on 29 ����, 2008, 06:20 �
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
-/**
- * @author Mohamed Talaat Saad
- */
 public class Bomb {
 
     /**
@@ -103,6 +92,7 @@ public class Bomb {
                     ex.printStackTrace();
                 }
                 SecureClient.getClient().sendCommandToServer(REMOVE  + DELIMITER + tank.getTankName());
+                clientTanks.remove(tank);
                 return true;
             }
         }
