@@ -153,7 +153,7 @@ public class Tank {
 
     public void shotFromKeyboard() {
         bomb[curBomb] = new Bomb(this.getXposition(), this.getYposition(), direction);
-        bomb[curBomb].startBombThread(true);
+        bomb[curBomb].startBombThread(true, this.getTankName());
         curBomb++;
     }
 
@@ -178,7 +178,7 @@ public class Tank {
     public void shot() {
         bomb[curBomb] = new Bomb(this.getXposition(), this.getYposition(), direction);
         if (bomb[curBomb] != null) {
-            bomb[curBomb].startBombThread(false);
+            bomb[curBomb].startBombThread(false, this.getTankName());
             curBomb++;
         }
     }

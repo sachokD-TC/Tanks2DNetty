@@ -15,6 +15,8 @@
  */
 package com.tanks2d.netty.server;
 
+import com.tanks2d.netty.server.entity.Score;
+import com.tanks2d.netty.server.entity.ScorePerRoom;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -85,6 +87,10 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                     namesMap.put(ctx.channel().id().asLongText(), name);
                 }
                 sendMessageToRoom(roomId, msg, name, ctx);
+                if (msg.contains("Register") || msg.contains("Remove")) {
+                    processScoreCommand(roomId, msg, ctx);
+                }
+
                 if (msg.contains("Exit")) {
                     sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
                     channelsMap.remove(ctx.channel());
@@ -93,6 +99,32 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                 }
             }
         }
+    }
+
+    private void processScoreCommand(Integer roomId, String msg, ChannelHandlerContext ctx) {
+        String name = msg.split(",")[1];
+        if (msg.contains("Register")) {
+            processRegisterCommand(roomId, name, ctx);
+        } else if (msg.contains("Remove")) {
+            processRemoveCommand(roomId, name);
+        }
+    }
+
+    private void processRegisterCommand(Integer roomId, String name, ChannelHandlerContext ctx) {
+        Map<String, Score> scoreMap = ScorePerRoom.scorePerRoomMap.get(roomId);
+        if (scoreMap == null) {
+            scoreMap = new HashMap<>();
+        }
+        if (scoreMap.get(name) == null) {
+            scoreMap.put(name, new Score(name, 0));
+            ScorePerRoom.scorePerRoomMap.put(roomId, scoreMap);
+        }
+        String msg = roomId + "#" + "Scores$" + ScorePerRoom.getRoomScores(roomId);
+        sendMessageToRoom(roomId, msg, name, ctx);
+    }
+
+    private void processRemoveCommand(Integer roomId, String name) {
+
     }
 
     private String getNameFromRegisterCommand(String command, String chanelId) {

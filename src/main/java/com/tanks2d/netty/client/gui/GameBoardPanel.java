@@ -1,7 +1,8 @@
 package com.tanks2d.netty.client.gui;
 
-import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.control.InputManager;
+import com.tanks2d.netty.client.entity.RoomScores;
+import com.tanks2d.netty.client.entity.Score;
 import com.tanks2d.netty.client.entity.Tank;
 
 import javax.imageio.ImageIO;
@@ -12,9 +13,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
-import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
-import static com.tanks2d.netty.client.utils.constants.Messages.*;
+import static com.tanks2d.netty.client.utils.constants.Messages.GAME_TITLE;
+import static com.tanks2d.netty.client.utils.constants.Messages.TIP_KILLED_MESSAGE;
 
 
 public class GameBoardPanel extends JPanel {
@@ -85,10 +85,10 @@ public class GameBoardPanel extends JPanel {
         tanks.put(newTank.getTankName(), newTank);
     }
 
-    public void removeTank(String tankName) {
+    public void removeTank(String tankName, String killerName) {
         tanks.remove(tankName);
         if (tankName.equals(clientTank.getTankName())) {
-            clientGUI.setTipsText(TIP_KILLED_MESSAGE);
+            clientGUI.setTipsText(TIP_KILLED_MESSAGE.replace("&NAME&", killerName));
             this.clientTank = new Tank();
             this.clientTank.setTankName(tankName);
             inputManager.setFirstMove(true);

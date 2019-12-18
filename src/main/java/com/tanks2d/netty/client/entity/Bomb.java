@@ -78,7 +78,7 @@ public class Bomb {
         return bombBuffImage;
     }
 
-    public boolean checkCollision() {
+    public boolean checkCollision(String starterName) {
         Collection<Tank> clientTanks = GameBoardPanel.getTanks().values();
         int x, y;
         for (Tank tank : clientTanks) {
@@ -91,7 +91,7 @@ public class Bomb {
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
-                SecureClient.getClient().sendCommandToServer(REMOVE  + DELIMITER + tank.getTankName());
+                SecureClient.getClient().sendCommandToServer(REMOVE + DELIMITER + tank.getTankName() + DELIMITER + starterName);
                 clientTanks.remove(tank);
                 return true;
             }
@@ -100,15 +100,17 @@ public class Bomb {
     }
 
 
-    public void startBombThread(boolean chekCollision) {
-        new BombShotThread(chekCollision).start();
+    public void startBombThread(boolean chekCollision, String starterName) {
+        new BombShotThread(chekCollision, starterName).start();
     }
 
     private class BombShotThread extends Thread {
-        boolean checkCollis;
+        private  boolean checkCollis;
+        private String starterName;
 
-        public BombShotThread(boolean chCollision) {
-            checkCollis = chCollision;
+        public BombShotThread(boolean chCollision, String starterName) {
+            this.checkCollis = chCollision;
+            this.starterName = starterName;
         }
 
         public void run() {
@@ -118,7 +120,7 @@ public class Bomb {
                     xPosi = 17 + xPosi;
                     while (yPosi > 50) {
                         yPosi = (int) (yPosi - yPosi * velocityY);
-                        if (checkCollision()) {
+                        if (checkCollision(starterName)) {
                             break;
                         }
                         try {
@@ -135,7 +137,7 @@ public class Bomb {
                     xPosi += 30;
                     while (xPosi < 564) {
                         xPosi = (int) (xPosi + xPosi * velocityX);
-                        if (checkCollision()) {
+                        if (checkCollision(starterName)) {
                             break;
                         }
                         try {
@@ -151,7 +153,7 @@ public class Bomb {
                     xPosi += 20;
                     while (yPosi < 505) {
                         yPosi = (int) (yPosi + yPosi * velocityY);
-                        if (checkCollision()) {
+                        if (checkCollision(starterName)) {
                             break;
                         }
                         try {
@@ -167,7 +169,7 @@ public class Bomb {
 
                     while (xPosi > 70) {
                         xPosi = (int) (xPosi - xPosi * velocityX);
-                        if (checkCollision()) {
+                        if (checkCollision(starterName)) {
                             break;
                         }
                         try {

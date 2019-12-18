@@ -6,7 +6,7 @@ public class Messages {
     public static final String TIP_START_MESSAGE = "Press F3 to start game";
     public static final String TIP_PLAY_GAME_MESSAGE = "Press ARROWS buttons to move, SPACE button for fire and F2 to type chat messages.";
     public static final String TIP_CHAT_MESSAGE = "Press ENTER to send message and F2 to escape chat field";
-    public static final String TIP_KILLED_MESSAGE = "Sorry you were killed, press F3 to try again?";
+    public static final String TIP_KILLED_MESSAGE = "Sorry you were killed by &NAME&, press F3 to try again?";
 
     public static final String EXIT_QUESTION_MESSAGE = "Are you sure you want to exit?";
     public static final String ENTER_NAME_MESSAGE = "Please enter your name";
