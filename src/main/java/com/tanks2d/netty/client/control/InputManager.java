@@ -29,6 +29,9 @@ public class InputManager implements KeyListener {
 
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
+        if(client.getClientGUI().isGunLoaded().get()){
+            client.getClientGUI().setGunLoaded();
+        }
         if (firstMove && keyCode == VK_F3) {
             client.registerTank(REGISTER + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER + clientTank.getYposition() + DELIMITER + clientTank.getDirection());
             client.getClientGUI().setTipsText(TIP_PLAY_GAME_MESSAGE);
@@ -56,8 +59,11 @@ public class InputManager implements KeyListener {
                     clientTank.moveBackward();
                 }
             } else if (keyCode == KeyEvent.VK_SPACE) {
-                client.sendCommandToServer(SHOT + DELIMITER + clientTank.getTankName());
-                clientTank.shotFromKeyboard();
+                if(client.getClientGUI().isGunLoaded().get()) {
+                    client.sendCommandToServer(SHOT + DELIMITER + clientTank.getTankName());
+                    clientTank.shotFromKeyboard();
+                    client.getClientGUI().loadGun();
+                }
             }
             if (keyCode == VK_RIGHT || keyCode == VK_LEFT || keyCode == VK_UP || keyCode == VK_DOWN) {
                 client.sendCommandToServer(UPDATE + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER +

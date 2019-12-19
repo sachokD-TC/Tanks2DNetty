@@ -155,6 +155,7 @@ public class Tank {
         bomb[curBomb] = new Bomb(this.getXposition(), this.getYposition(), direction);
         bomb[curBomb].startBombThread(true, this.getTankName());
         curBomb++;
+
     }
 
     public Bomb[] getBomb() {

@@ -2,6 +2,8 @@ package com.tanks2d.netty.client.gui;
 
 import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.entity.Tank;
+import com.tanks2d.netty.client.worker.GunLoader;
+import com.tanks2d.netty.client.worker.ParallelTasks;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +11,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
 import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
@@ -25,6 +32,7 @@ public class ClientGUI extends JFrame {
     private final JTextField chatMessageTextField;
     private final JTextArea chatTextArea;
     private final JButton sendButton;
+    private final JPanel weaponPanel;
     private JLabel ipaddressLabel;
     private JLabel portLabel;
     private JScrollPane chatScrollPane;
@@ -36,12 +44,15 @@ public class ClientGUI extends JFrame {
     private JPanel gameTipsPanel;
     private JLabel gameTipsLabel;
     private JPanel gameStatusPanel;
-    private JPanel roomScoresAndLogPanel;
+    private JPanel roomScoresAndWeaponPanel;
+    private JProgressBar weaponProgressBar;
     private JLabel roomScoresLabel;
+    private JLabel weaponLabel;
     private JTextArea roomScoresTextArea;
     private SecureClient client;
     private Tank clientTank;
     private static int score;
+    public static AtomicBoolean isGunLoaded = new AtomicBoolean(true);
 
     int width = 990, height = 630;
     public GameBoardPanel boardPanel;
@@ -99,12 +110,12 @@ public class ClientGUI extends JFrame {
         registerPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         registerPanel.setLayout(null);
 
-        roomScoresAndLogPanel = new JPanel();
-        roomScoresAndLogPanel.setBackground(Color.YELLOW);
-        roomScoresAndLogPanel.setSize(200, 140);
-        roomScoresAndLogPanel.setBounds(770, 50, 200, 530);
-        roomScoresAndLogPanel.setLayout(null);
-        roomScoresAndLogPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+        roomScoresAndWeaponPanel = new JPanel();
+        roomScoresAndWeaponPanel.setBackground(Color.YELLOW);
+        roomScoresAndWeaponPanel.setSize(200, 140);
+        roomScoresAndWeaponPanel.setBounds(770, 50, 200, 530);
+        roomScoresAndWeaponPanel.setLayout(null);
+        roomScoresAndWeaponPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 
         gameStatusPanel = new JPanel();
         gameStatusPanel.setBackground(Color.YELLOW);
@@ -135,14 +146,26 @@ public class ClientGUI extends JFrame {
         scoreLabel = new JLabel("Score : 0");
         scoreLabel.setBounds(10, 20, 100, 25);
 
-        roomScoresLabel= new JLabel("Tanks in room");
+        roomScoresLabel = new JLabel("Tanks in room");
         roomScoresLabel.setBounds(75, 10, 100, 25);
-        roomScoresAndLogPanel.add(roomScoresLabel);
+        roomScoresAndWeaponPanel.add(roomScoresLabel);
         roomScoresTextArea = new JTextArea();
         roomScoresTextArea.setBounds(10, 40, 180, 200);
         roomScoresTextArea.setEditable(false);
         roomScoresTextArea.setBorder(BorderFactory.createLoweredBevelBorder());
-        roomScoresAndLogPanel.add(roomScoresTextArea);
+        roomScoresAndWeaponPanel.add(roomScoresTextArea);
+        weaponLabel = new JLabel("Weapon");
+        weaponLabel.setBounds(75, 250, 180, 20);
+        roomScoresAndWeaponPanel.add(weaponLabel);
+
+        weaponPanel = new JPanel();
+        weaponProgressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+        weaponProgressBar.setMinimum(0);
+        weaponProgressBar.setMaximum(100);
+        weaponProgressBar.setStringPainted(true);
+        weaponProgressBar.setValue(100);
+        weaponPanel.setBounds(10, 270, 180, 20);
+        roomScoresAndWeaponPanel.add(weaponPanel);
 
         ipaddressText = new JTextField("localhost");
         ipaddressText.setBounds(90, 25, 100, 25);
@@ -215,10 +238,14 @@ public class ClientGUI extends JFrame {
         getContentPane().add(registerPanel);
         getContentPane().add(gameStatusPanel);
         getContentPane().add(gameTipsPanel);
-        getContentPane().add(roomScoresAndLogPanel);
+        getContentPane().add(roomScoresAndWeaponPanel);
         setVisible(true);
     }
 
+    public void loadGun() {
+        isGunLoaded.set(false);
+        weaponPanel.setVisible(false);
+    }
 
     public void registerAction() {
         if (nameTextField.getText().equals("")) {
@@ -280,7 +307,7 @@ public class ClientGUI extends JFrame {
         }
     }
 
-    public void activateChat(){
+    public void activateChat() {
         chatMessageTextField.setFocusable(true);
         chatMessageTextField.setRequestFocusEnabled(true);
         chatMessageTextField.grabFocus();
@@ -308,6 +335,28 @@ public class ClientGUI extends JFrame {
 
     public static void main(String[] args) {
         new ClientGUI();
+
+        ParallelTasks tasks = new ParallelTasks();
+        final Runnable waitFiveSecond = new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                    isGunLoaded.set(true);
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        tasks.add(waitFiveSecond);
+        try {
+            for (int i = 0; i != 100; i++) {
+                while (isGunLoaded.get()) {
+                }
+                tasks.go();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public Tank getClientTank() {
@@ -318,8 +367,19 @@ public class ClientGUI extends JFrame {
         gameTipsLabel.setText(tip);
     }
 
-    public void updateRoomScores(String scores){
+    public void updateRoomScores(String scores) {
         roomScoresTextArea.setText(scores);
     }
 
+    public AtomicBoolean isGunLoaded() {
+        return isGunLoaded;
+    }
+
+    public void setIsGunLoaded(boolean isGunLoaded) {
+        this.isGunLoaded.set(isGunLoaded);
+    }
+
+    public void setGunLoaded() {
+        weaponPanel.setVisible(true);
+    }
 }

@@ -47,9 +47,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
     }
 
     @Override
-    public void channelActive(final ChannelHandlerContext ctx) {
-        // Once session is secured, send a greeting and register the channel to the global channel
-        // list so the channel received the messages from others.
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         ctx.pipeline().get(SslHandler.class).handshakeFuture().addListener(
                 (GenericFutureListener<Future<Channel>>) future -> {
                     ChannelGroup channels;
@@ -57,9 +55,13 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                     if (roomId == 0) {
                         channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
                         roomId++;
+                        channels.add(ctx.channel());
+                        ctx.writeAndFlush(roomId + "#player joined \n");
+                        namesMap.put(ctx.channel().id().asLongText(), "");
+                        channelsMap.put(roomId, channels);
                     } else {
                         channels = channelsMap.get(roomId);
-                        if (channels.size() - 1 == numberOfTanks) {
+                        if (channels.size() - 1 >= numberOfTanks) {
                             roomId++;
                             channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
                             ctx.writeAndFlush(roomId + "#new room opened \n");
@@ -72,6 +74,10 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                         channelsMap.put(roomId, channels);
                     }
                 });
+    }
+
+    @Override
+    public void channelActive(final ChannelHandlerContext ctx) {
     }
 
     @Override
@@ -163,4 +169,5 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
         cause.printStackTrace();
         ctx.close();
     }
+
 }
