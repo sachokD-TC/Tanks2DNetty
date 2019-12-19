@@ -102,6 +102,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
         }
     }
 
+
     private void processScoreCommand(Integer roomId, String msg, ChannelHandlerContext ctx) {
         String name = msg.split(",")[1];
         if (msg.contains("Register")) {
@@ -109,14 +110,14 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
         } else if (msg.contains("Remove")) {
             String killerName = msg.split(",")[2];
             processRemoveCommand(roomId, killerName);
-        } else if(msg.contains("Exit")){
+        } else if (msg.contains("Exit")) {
             processExitCommand(roomId, name);
         }
         msg = roomId + "#" + "Scores$" + ScorePerRoom.getRoomScores(roomId);
         sendMessageToRoom(roomId, msg, name, ctx);
     }
 
-    private void processExitCommand(Integer roomId, String name){
+    private void processExitCommand(Integer roomId, String name) {
         Map<String, Score> scoreMap = ScorePerRoom.scorePerRoomMap.get(roomId);
         scoreMap.remove(name);
     }
@@ -135,7 +136,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
     private void processRemoveCommand(Integer roomId, String killerName) {
         Map<String, Score> scoreMap = ScorePerRoom.scorePerRoomMap.get(roomId);
         Score score = scoreMap.get(killerName);
-        score.setScore(score.getScore()+50);
+        score.setScore(score.getScore() + 50);
     }
 
     private String getNameFromRegisterCommand(String command, String chanelId) {

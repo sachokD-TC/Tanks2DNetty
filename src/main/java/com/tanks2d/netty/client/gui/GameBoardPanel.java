@@ -1,8 +1,6 @@
 package com.tanks2d.netty.client.gui;
 
 import com.tanks2d.netty.client.control.InputManager;
-import com.tanks2d.netty.client.entity.RoomScores;
-import com.tanks2d.netty.client.entity.Score;
 import com.tanks2d.netty.client.entity.Tank;
 
 import javax.imageio.ImageIO;

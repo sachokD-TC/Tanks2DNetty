@@ -15,11 +15,8 @@
  */
 package com.tanks2d.netty.client;
 
-import com.tanks2d.netty.client.entity.RoomScores;
-import com.tanks2d.netty.client.entity.Score;
 import com.tanks2d.netty.client.entity.Tank;
 import com.tanks2d.netty.client.gui.ClientGUI;
-import com.tanks2d.netty.client.utils.constants.Commands;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -30,7 +27,6 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 import javax.net.ssl.SSLException;
-import java.net.ConnectException;
 import java.util.Collection;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.*;
@@ -135,8 +131,6 @@ public final class SecureClient {
     }
 
     public void exitTank(String msg) {
-        String name = msg.split(",")[1];
-        RoomScores.scoresMap.remove(name);
         removeTank(msg);
     }
 
@@ -177,4 +171,5 @@ public final class SecureClient {
         msg = msg.substring(msg.indexOf(SCORES) + SCORES.length()).replace("&","\n");
         clientGUI.updateRoomScores(msg);
     }
+
 }

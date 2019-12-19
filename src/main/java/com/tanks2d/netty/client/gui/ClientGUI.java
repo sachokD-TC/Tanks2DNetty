@@ -1,7 +1,6 @@
 package com.tanks2d.netty.client.gui;
 
 import com.tanks2d.netty.client.SecureClient;
-import com.tanks2d.netty.client.entity.RoomScores;
 import com.tanks2d.netty.client.entity.Tank;
 
 import javax.swing.*;
@@ -37,10 +36,9 @@ public class ClientGUI extends JFrame {
     private JPanel gameTipsPanel;
     private JLabel gameTipsLabel;
     private JPanel gameStatusPanel;
-    private JPanel roomScoresPanel;
+    private JPanel roomScoresAndLogPanel;
     private JLabel roomScoresLabel;
     private JTextArea roomScoresTextArea;
-    private JScrollPane roomScoresScrollPane;
     private SecureClient client;
     private Tank clientTank;
     private static int score;
@@ -98,20 +96,23 @@ public class ClientGUI extends JFrame {
         registerPanel.setBackground(Color.YELLOW);
         registerPanel.setSize(200, 140);
         registerPanel.setBounds(560, 50, 200, 140);
+        registerPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         registerPanel.setLayout(null);
 
-        roomScoresPanel = new JPanel();
-        roomScoresPanel.setBackground(Color.YELLOW);
-        roomScoresPanel.setSize(200, 140);
-        roomScoresPanel.setBounds(770, 50, 200, 530);
-        roomScoresPanel.setLayout(null);
-        roomScoresPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+        roomScoresAndLogPanel = new JPanel();
+        roomScoresAndLogPanel.setBackground(Color.YELLOW);
+        roomScoresAndLogPanel.setSize(200, 140);
+        roomScoresAndLogPanel.setBounds(770, 50, 200, 530);
+        roomScoresAndLogPanel.setLayout(null);
+        roomScoresAndLogPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 
         gameStatusPanel = new JPanel();
         gameStatusPanel.setBackground(Color.YELLOW);
         gameStatusPanel.setSize(200, 300);
         gameStatusPanel.setBounds(560, 210, 200, 311);
+        gameStatusPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         gameStatusPanel.setLayout(null);
+
 
         gameTipsPanel = new JPanel();
         gameTipsPanel.setBackground(Color.YELLOW);
@@ -136,10 +137,12 @@ public class ClientGUI extends JFrame {
 
         roomScoresLabel= new JLabel("Tanks in room");
         roomScoresLabel.setBounds(75, 10, 100, 25);
-        roomScoresPanel.add(roomScoresLabel);
+        roomScoresAndLogPanel.add(roomScoresLabel);
         roomScoresTextArea = new JTextArea();
-        roomScoresTextArea.setBounds(10, 40, 180, 480);
-        roomScoresPanel.add(roomScoresTextArea);
+        roomScoresTextArea.setBounds(10, 40, 180, 200);
+        roomScoresTextArea.setEditable(false);
+        roomScoresTextArea.setBorder(BorderFactory.createLoweredBevelBorder());
+        roomScoresAndLogPanel.add(roomScoresTextArea);
 
         ipaddressText = new JTextField("localhost");
         ipaddressText.setBounds(90, 25, 100, 25);
@@ -212,7 +215,7 @@ public class ClientGUI extends JFrame {
         getContentPane().add(registerPanel);
         getContentPane().add(gameStatusPanel);
         getContentPane().add(gameTipsPanel);
-        getContentPane().add(roomScoresPanel);
+        getContentPane().add(roomScoresAndLogPanel);
         setVisible(true);
     }
 
@@ -318,4 +321,5 @@ public class ClientGUI extends JFrame {
     public void updateRoomScores(String scores){
         roomScoresTextArea.setText(scores);
     }
+
 }
