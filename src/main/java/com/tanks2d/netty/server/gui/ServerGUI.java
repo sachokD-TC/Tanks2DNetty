@@ -100,4 +100,20 @@ public class ServerGUI extends JFrame {
     public static void main(String args[]) {
         new ServerGUI();
     }
+
+    /**
+     *
+     * @return button instance for FEST Swing tests
+     */
+    public JButton getStartServerButton() {
+        return startServerButton;
+    }
+
+    /**
+     *
+     * @return button instance for FEST Swing tests
+     */
+    public JButton getStopServerButton() {
+        return stopServerButton;
+    }
 }

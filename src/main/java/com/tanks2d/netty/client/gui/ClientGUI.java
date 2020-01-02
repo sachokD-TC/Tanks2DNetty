@@ -29,8 +29,8 @@ public class ClientGUI extends JFrame {
     private JLabel portLabel;
     private JScrollPane chatScrollPane;
     private static JLabel scoreLabel;
-    private JTextField ipaddressText;
-    private JTextField portText;
+    private JTextField hostTextField;
+    private JTextField portTextField;
     private JButton registerButton;
     private JPanel registerPanel;
     private JPanel gameTipsPanel;
@@ -164,11 +164,11 @@ public class ClientGUI extends JFrame {
         weaponPanel.setBounds(10, 270, 180, 20);
         roomScoresAndWeaponPanel.add(weaponPanel);
 
-        ipaddressText = new JTextField("localhost");
-        ipaddressText.setBounds(90, 25, 100, 25);
+        hostTextField = new JTextField("localhost");
+        hostTextField.setBounds(90, 25, 100, 25);
 
-        portText = new JTextField("8992");
-        portText.setBounds(90, 55, 100, 25);
+        portTextField = new JTextField("8992");
+        portTextField.setBounds(90, 55, 100, 25);
 
         registerButton = new JButton("Register");
         registerButton.setBounds(60, 100, 90, 25);
@@ -178,8 +178,8 @@ public class ClientGUI extends JFrame {
 
         registerPanel.add(ipaddressLabel);
         registerPanel.add(portLabel);
-        registerPanel.add(ipaddressText);
-        registerPanel.add(portText);
+        registerPanel.add(hostTextField);
+        registerPanel.add(portTextField);
         registerPanel.add(registerButton);
 
         nameLabel = new JLabel(NAME_LABEL_TEXT);
@@ -251,7 +251,7 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *  set gun panel not visible
+     * set gun panel not visible
      */
     public void loadGun() {
         isGunLoaded.set(false);
@@ -259,45 +259,59 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *  Process registration
-     *  check for entering name
-     *  check for connection with server
-     *
+     * Process registration
+     * check for entering name
+     * check for connection with server
      */
     public void registerAction() {
-        if (nameTextField.getText().equals("")) {
-            JOptionPane.showMessageDialog(this, ENTER_NAME_MESSAGE, GAME_TITLE, JOptionPane.INFORMATION_MESSAGE);
+        if (hostTextField.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, HOST_EMPTY_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+        } else if (portTextField.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, PORT_EMPTY_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+        } else if (nameTextField.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, ENTER_NAME_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
         } else {
-            nameLabel.setText(NAME_LABEL_TEXT + nameTextField.getText());
-            nameTextField.setEnabled(false);
-            chatMessageTextField.setEnabled(true);
-            registerButton.setEnabled(false);
-
-            if (SecureClient.checkConnection(ipaddressText.getText(), Integer.parseInt(portText.getText()))) {
-                setTipsText(TIP_START_MESSAGE);
-                client = SecureClient.getClient(ipaddressText.getText(), Integer.parseInt(portText.getText()), this);
-                clientTank = new Tank();
-                clientTank.setTankName(nameTextField.getText());
-                boardPanel = new GameBoardPanel(clientTank, this);
-                getContentPane().add(boardPanel);
-                boardPanel.setGameStatus(true);
-                boardPanel.repaint();
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-                boardPanel.setFocusable(true);
-                boardPanel.grabFocus();
+            if (!portTextField.getText().matches("^[0-9]+$")) {
+                JOptionPane.showMessageDialog(this, PORT_NOT_CORRECT_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, SERVER_NOT_RUNNING_MESSAGE, GAME_TITLE, JOptionPane.INFORMATION_MESSAGE);
-                registerButton.setEnabled(true);
+                connectToServer();
             }
         }
     }
 
     /**
+     *  connect to server after checks
+     */
+    private void connectToServer() {
+        nameLabel.setText(NAME_LABEL_TEXT + nameTextField.getText());
+        if (SecureClient.checkConnection(hostTextField.getText(), Integer.parseInt(portTextField.getText()))) {
+            setTipsText(TIP_START_MESSAGE);
+            nameTextField.setEnabled(false);
+            chatMessageTextField.setEnabled(true);
+            registerButton.setEnabled(false);
+            client = SecureClient.getClient(hostTextField.getText(), Integer.parseInt(portTextField.getText()), this);
+            clientTank = new Tank();
+            clientTank.setTankName(nameTextField.getText());
+            boardPanel = new GameBoardPanel(clientTank, this);
+            getContentPane().add(boardPanel);
+            boardPanel.setGameStatus(true);
+            boardPanel.repaint();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            boardPanel.setFocusable(true);
+            boardPanel.grabFocus();
+        } else {
+            JOptionPane.showMessageDialog(this, SERVER_NOT_RUNNING_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+            registerButton.setEnabled(true);
+        }
+    }
+
+    /**
      * change tip, and make possible chatting
+     *
      * @param messageText - message to chat
      * @param e
      */
@@ -314,6 +328,7 @@ public class ClientGUI extends JFrame {
 
     /**
      * send message to server
+     *
      * @param messageText - message to chat
      */
     private void sendMessageToChatLocal(String messageText) {
@@ -327,6 +342,7 @@ public class ClientGUI extends JFrame {
 
     /**
      * add message to text area of chat
+     *
      * @param messageText - message to chat
      */
     public void sendMessageToServerChat(String messageText) {
@@ -337,7 +353,7 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *  set focus for chat window
+     * set focus for chat window
      */
     public void activateChat() {
         chatMessageTextField.setFocusable(true);
@@ -347,6 +363,7 @@ public class ClientGUI extends JFrame {
 
     /**
      * setter for client score and label of it
+     *
      * @param scoreInt - score of client Tank
      */
     public static void setScore(int scoreInt) {
@@ -357,10 +374,11 @@ public class ClientGUI extends JFrame {
     /**
      * Event on closing window - show confirm dialog - are you sure..
      * send command to server - exit
+     *
      * @param e
      */
     public void windowClosing(WindowEvent e) {
-        int response = JOptionPane.showConfirmDialog(this, EXIT_QUESTION_MESSAGE, GAME_TITLE, JOptionPane.YES_NO_OPTION);
+        int response = JOptionPane.showConfirmDialog(this, EXIT_QUESTION_MESSAGE, EXIT_MESSAGE_TITLE, JOptionPane.YES_NO_OPTION);
         if (response == JOptionPane.YES_OPTION) {
             if (SecureClient.getClient() != null)
                 SecureClient.getClient().sendCommandToServer(EXIT + DELIMITER + clientTank.getTankName() + DELIMITER + "-");
@@ -370,7 +388,6 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *
      * @return - instance of SecureClient
      */
     public SecureClient getClient() {
@@ -405,7 +422,6 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *
      * @return - client Tank
      */
     public Tank getClientTank() {
@@ -414,6 +430,7 @@ public class ClientGUI extends JFrame {
 
     /**
      * Set tip for tip bar
+     *
      * @param tip - string value of tip, that should be shown
      */
     public void setTipsText(String tip) {
@@ -422,6 +439,7 @@ public class ClientGUI extends JFrame {
 
     /**
      * Update text area, where Room scores show
+     *
      * @param scores - room scores
      */
     public void updateRoomScores(String scores) {
@@ -429,7 +447,6 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *
      * @return return true if gun loaded
      */
     public AtomicBoolean isGunLoaded() {
@@ -438,6 +455,7 @@ public class ClientGUI extends JFrame {
 
     /**
      * setter for thread save value - isGunLoaded
+     *
      * @param isGunLoaded
      */
     public void setIsGunLoaded(boolean isGunLoaded) {
@@ -450,4 +468,34 @@ public class ClientGUI extends JFrame {
     public void setGunLoadedInPanel() {
         weaponPanel.setVisible(true);
     }
+
+    /**
+     * @return - register button for FEST Swing testing
+     */
+    public JButton getRegisterButton() {
+        return registerButton;
+    }
+
+    /**
+     * @return - name text field for FEST Swing testing
+     */
+    public JTextField getNameTextField() {
+        return nameTextField;
+    }
+
+    /**
+     * @return - name text field for FEST Swing testing
+     */
+    public JTextField getHostTextField() {
+        return hostTextField;
+    }
+
+    /**
+     * @return - name text field for FEST Swing testing
+     */
+    public JTextField getPortTextField() {
+        return portTextField;
+    }
+
+
 }
