@@ -40,6 +40,7 @@ public class InputManager implements KeyListener {
         if (firstMove && keyCode == VK_F3) {
             client.registerTank(REGISTER + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER + clientTank.getYposition() + DELIMITER + clientTank.getDirection());
             client.getClientGUI().setTipsText(TIP_PLAY_GAME_MESSAGE);
+            client.getClientGUI().getContentPane().repaint();
             firstMove = false;
         }
         if (!firstMove) {
