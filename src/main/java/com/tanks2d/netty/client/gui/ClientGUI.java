@@ -6,10 +6,7 @@ import com.tanks2d.netty.client.worker.ParallelTasks;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -198,6 +195,17 @@ public class ClientGUI extends JFrame {
         chatMessageTextField = new JTextField();
         chatMessageTextField.setBounds(10, 120, 150, 25);
         chatMessageTextField.setEnabled(false);
+        chatMessageTextField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                setTipsText(TIP_CHAT_MESSAGE);
+            }
+
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+
+            }
+        });
 
         chatTextArea = new JTextArea();
         chatTextArea.setEditable(false);

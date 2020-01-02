@@ -7,8 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.*;
-import static com.tanks2d.netty.client.utils.constants.Messages.TIP_CHAT_MESSAGE;
-import static com.tanks2d.netty.client.utils.constants.Messages.TIP_PLAY_GAME_MESSAGE;
+import static com.tanks2d.netty.client.utils.constants.Messages.*;
 import static java.awt.event.KeyEvent.*;
 
 public class InputManager implements KeyListener {
@@ -78,6 +77,9 @@ public class InputManager implements KeyListener {
                 client.getClientGUI().activateChat();
                 client.getClientGUI().setTipsText(TIP_CHAT_MESSAGE);
             }
+        }
+        if(firstMove){
+           client.getClientGUI().setTipsText(TIP_START_MESSAGE);
         }
     }
 
