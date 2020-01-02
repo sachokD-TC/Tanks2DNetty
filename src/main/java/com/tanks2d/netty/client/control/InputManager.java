@@ -17,7 +17,8 @@ public class InputManager implements KeyListener {
     private SecureClient client;
 
     /**
-     * Creates a new instance of com.tanks2d.client.InputManager
+     * Creates a new instance of InputManager
+     * @param clientTank - instance of client tank
      */
     public InputManager(Tank clientTank) {
         this.client = SecureClient.getClient();
@@ -27,10 +28,14 @@ public class InputManager implements KeyListener {
     public void keyTyped(KeyEvent e) {
     }
 
+    /**
+     * Process key-press by user
+     * @param e
+     */
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
         if(client.getClientGUI().isGunLoaded().get()){
-            client.getClientGUI().setGunLoaded();
+            client.getClientGUI().setGunLoadedInPanel();
         }
         if (firstMove && keyCode == VK_F3) {
             client.registerTank(REGISTER + DELIMITER + clientTank.getTankName() + DELIMITER + clientTank.getXposition() + DELIMITER + clientTank.getYposition() + DELIMITER + clientTank.getDirection());
@@ -78,10 +83,18 @@ public class InputManager implements KeyListener {
     public void keyReleased(KeyEvent e) {
     }
 
+    /**
+     *
+     * @param firstMove - true if this is very firs move for client tank
+     */
     public void setFirstMove(boolean firstMove) {
         this.firstMove = firstMove;
     }
 
+    /**
+     * Setter for client tank
+     * @param clientTank
+     */
     public void setClientTank(Tank clientTank) {
         this.clientTank = clientTank;
     }

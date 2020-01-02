@@ -58,7 +58,7 @@ public class GameBoardPanel extends JPanel {
             for (int j = 0; j < 1000; j++) {
                 if (clientTank.getBomb()[j] != null) {
                     if (clientTank.getBomb()[j].stop == false) {
-                        g.drawImage(clientTank.getBomb()[j].getBomBufferdImg(), clientTank.getBomb()[j].getPosiX(), clientTank.getBomb()[j].getPosiY(), this);
+                        g.drawImage(clientTank.getBomb()[j].getBombBufferdImg(), clientTank.getBomb()[j].getPosiX(), clientTank.getBomb()[j].getPosiY(), this);
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class GameBoardPanel extends JPanel {
                     for (int j = 0; j < 1000; j++) {
                         if (tank.getBomb()[j] != null) {
                             if (tank.getBomb()[j].stop == false) {
-                                g.drawImage(tank.getBomb()[j].getBomBufferdImg(), tank.getBomb()[j].getPosiX(), tank.getBomb()[j].getPosiY(), this);
+                                g.drawImage(tank.getBomb()[j].getBombBufferdImg(), tank.getBomb()[j].getPosiX(), tank.getBomb()[j].getPosiY(), this);
                             }
                         }
                     }

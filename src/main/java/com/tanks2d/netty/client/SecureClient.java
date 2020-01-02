@@ -31,9 +31,7 @@ import java.util.Collection;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.*;
 
-/**
- * Simple SSL chat client modified from {@link }.
- */
+
 public final class SecureClient {
 
     private Channel ch;
@@ -41,6 +39,14 @@ public final class SecureClient {
     private static SecureClient client;
     private ClientGUI clientGUI;
 
+    /**
+     *
+     * @param host - ip or DNS name for server
+     * @param port - port to connect with server
+     * @param clientGUI - client Graphic interface
+     * @throws SSLException
+     * @throws InterruptedException
+     */
     private SecureClient(String host, int port, ClientGUI clientGUI) throws SSLException, InterruptedException {
         final SslContext sslCtx = SslContextBuilder.forClient()
                 .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
@@ -54,10 +60,22 @@ public final class SecureClient {
         this.clientGUI = clientGUI;
     }
 
+    /**
+     *
+     * @return instasnce of SecureClient
+     */
     public static SecureClient getClient() {
         return client;
     }
 
+    /**
+     * make client variable singleton - if it's null - return new instance
+     * if not - return already created one.
+     * @param host - ip or DNS name for server
+     * @param port - port to connect with server
+     * @param clientGUI - client Graphic interface
+     * @return
+     */
     public static SecureClient getClient(String host, int port, ClientGUI clientGUI) {
         if (client == null) {
             try {
@@ -71,6 +89,11 @@ public final class SecureClient {
         return client;
     }
 
+    /**
+     * @param host - ip or DNS name for server
+     * @param port - port to connect with server*
+     * @return true if connection exists
+     */
     public static boolean checkConnection(String host, int port) {
         SslContext sslCtx = null;
         try {
@@ -95,6 +118,10 @@ public final class SecureClient {
         return isActive;
     }
 
+    /**
+     * update tank position
+     * @param command - special string command delimited with comma
+     */
     public void updateTank(String command) {
         String[] params = command.split(",");
         String name = params[1];
@@ -104,6 +131,10 @@ public final class SecureClient {
         clientGUI.boardPanel.updateTank(name, x, y, direction);
     }
 
+    /**
+     * Register new tank on board
+     * @param command - special string command delimited with comma
+     */
     public void registerTank(String command) {
         String[] params = command.split(",");
         String name = params[1];
@@ -118,6 +149,9 @@ public final class SecureClient {
         }
     }
 
+    /**
+     * Broadcast message with new tank appearance for all clients in room
+     */
     public void sendAllTanksOnBoard() {
         Collection<Tank> tanks = clientGUI.boardPanel.getTanks().values();
         for (Tank tank : tanks) {
@@ -130,17 +164,29 @@ public final class SecureClient {
         }
     }
 
-    public void exitTank(String msg) {
-        removeTank(msg);
+    /**
+     * process exit command
+     * @param command - special string command delimited with comma
+     */
+    public void exitTank(String command) {
+        removeTank(command);
     }
 
-    public void removeTank(String msg) {
-        String[] params = msg.split(",");
+    /**
+     * Process removing command (in case of death of tank)
+     * @param command - special string command delimited with comma
+     */
+    public void removeTank(String command) {
+        String[] params = command.split(",");
         String killerName = params[2];
         if (!killerName.equals(params[1]))
             clientGUI.boardPanel.removeTank(params[1], killerName);
     }
 
+    /**
+     * send message to secure channel
+     * @param command - special string command delimited with comma
+     */
     public void sendCommandToServer(String command) {
         ch.writeAndFlush(SecureClientMessageHandler.roomId + "#" + command + "\r\n");
     }
@@ -149,17 +195,25 @@ public final class SecureClient {
         group.shutdownGracefully();
     }
 
-    public void shot(String msg) {
-        String[] params = msg.split(",");
+    /**
+     * Process shot command
+     * @param command - special string command delimited with comma
+     */
+    public void shot(String command) {
+        String[] params = command.split(",");
         String name = params[1];
         if (clientGUI.boardPanel.getTank(name) != null)
             clientGUI.boardPanel.getTank(name).shot();
     }
 
-    public void sendMessageToChat(String msg) {
-        if (!msg.contains("#" + clientGUI.getClientTank().getTankName() + ":")) {
-            msg = msg.substring(msg.lastIndexOf("#"));
-            clientGUI.sendMessageToServerChat(msg + "\n");
+    /**
+     * Process send to chat command
+     * @param command - special string command delimited with semi column
+     */
+    public void sendMessageToChat(String command) {
+        if (!command.contains("#" + clientGUI.getClientTank().getTankName() + ":")) {
+            command = command.substring(command.lastIndexOf("#"));
+            clientGUI.sendMessageToServerChat(command + "\n");
         }
     }
 
@@ -167,9 +221,13 @@ public final class SecureClient {
         return clientGUI;
     }
 
-    public void processScores(String msg) {
-        msg = msg.substring(msg.indexOf(SCORES) + SCORES.length()).replace("&","\n");
-        clientGUI.updateRoomScores(msg);
+    /**
+     * Update room scores
+     * @param command - special string command delimited with & sign
+     */
+    public void processScores(String command) {
+        command = command.substring(command.indexOf(SCORES) + SCORES.length()).replace("&","\n");
+        clientGUI.updateRoomScores(command);
     }
 
 }

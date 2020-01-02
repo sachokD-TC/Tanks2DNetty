@@ -98,13 +98,10 @@ public class SimpleSoundPlayer {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
         // wait until all data is played
         line.drain();
-
         // close the line
         line.close();
-
     }
 
 

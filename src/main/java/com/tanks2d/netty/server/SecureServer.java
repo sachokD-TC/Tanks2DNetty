@@ -34,6 +34,13 @@ public final class SecureServer implements Runnable {
     private final int port;
     private final int numbetOfTanks;
 
+    /**
+     * Server constructor
+     * @param port - port for connection
+     * @param numberOfTanks - max number of tanks in one room
+     * @throws CertificateException
+     * @throws SSLException
+     */
     public SecureServer(int port, int numberOfTanks) throws CertificateException, SSLException {
         this.port = port;
         this.numbetOfTanks = numberOfTanks;

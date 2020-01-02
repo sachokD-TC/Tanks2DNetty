@@ -4,6 +4,11 @@ public class Score {
     private final String name;
     private int score;
 
+    /**
+     *
+     * @param name - name of user
+     * @param score - number of points
+     */
     public Score(String name, int score){
         this.name = name;
         this.score = score;

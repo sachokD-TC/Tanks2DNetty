@@ -25,7 +25,7 @@ public class Tank {
     }
 
     /**
-     * Creates a new instance of com.tanks2d.client.Tank
+     * Creates a new instance of Tank - random one
      */
     public Tank() {
         while (posiX < 70 | posiY < 50 | posiY > height - 43 | posiX > width - 43) {
@@ -35,6 +35,13 @@ public class Tank {
         loadImage(4);
     }
 
+    /**
+     *  Creates a new instance of Tank with parameters
+     * @param x
+     * @param y
+     * @param dir
+     * @param name
+     */
     public Tank(int x, int y, int dir, String name) {
         posiX = x;
         posiY = y;
@@ -43,6 +50,10 @@ public class Tank {
         loadImage(0);
     }
 
+    /**
+     * Loader for images
+     * @param a = number of picture to be loaded
+     */
     public void loadImage(int a) {
         tankImg = new Image[4];
         for (int i = a; i < tankImg.length + a; i++) {
@@ -77,6 +88,9 @@ public class Tank {
         posiY = y;
     }
 
+    /**
+     *  Move tank left
+     */
     public void moveLeft() {
         if (direction == 1 | direction == 3) {
             ImageBuff = new BufferedImage(tankImg[3].getWidth(null), tankImg[3].getHeight(null), BufferedImage.TYPE_INT_RGB);
@@ -97,6 +111,9 @@ public class Tank {
 
     }
 
+    /**
+     *  Move tank right
+     */
     public void moveRight() {
         if (direction == 1 | direction == 3) {
             ImageBuff = new BufferedImage(tankImg[1].getWidth(null), tankImg[1].getHeight(null), BufferedImage.TYPE_INT_RGB);
@@ -115,7 +132,9 @@ public class Tank {
 
     }
 
-
+    /**
+     *  Move tank forward
+     */
     public void moveForward() {
         if (direction == 2 | direction == 4) {
             ImageBuff = new BufferedImage(tankImg[0].getWidth(null), tankImg[0].getHeight(null), BufferedImage.TYPE_INT_RGB);
@@ -134,6 +153,9 @@ public class Tank {
         }
     }
 
+    /**
+     *  Move tank backward
+     */
     public void moveBackward() {
         if (direction == 2 | direction == 4) {
             ImageBuff = new BufferedImage(tankImg[2].getWidth(null), tankImg[2].getHeight(null), BufferedImage.TYPE_INT_RGB);
@@ -151,6 +173,9 @@ public class Tank {
         }
     }
 
+    /**
+     *  Process fire of tank
+     */
     public void shotFromKeyboard() {
         bomb[curBomb] = new Bomb(this.getXposition(), this.getYposition(), direction);
         bomb[curBomb].startBombThread(true, this.getTankName());
@@ -170,12 +195,19 @@ public class Tank {
         return tankName;
     }
 
+    /**
+     * Set tank direction
+     * @param dir
+     */
     public void setDirection(int dir) {
         ImageBuff = new BufferedImage(tankImg[dir - 1].getWidth(null), tankImg[dir - 1].getHeight(null), BufferedImage.TYPE_INT_RGB);
         ImageBuff.createGraphics().drawImage(tankImg[dir - 1], 0, 0, null);
         direction = dir;
     }
 
+    /**
+     * Process bomb fire
+     */
     public void shot() {
         bomb[curBomb] = new Bomb(this.getXposition(), this.getYposition(), direction);
         if (bomb[curBomb] != null) {
@@ -184,6 +216,12 @@ public class Tank {
         }
     }
 
+    /**
+     *  Check of collision for tank
+     * @param xP
+     * @param yP
+     * @return - true if tank hit another tank, or reach the border of play room
+     */
     public boolean checkCollision(int xP, int yP) {
         Collection<Tank> clientTanks = GameBoardPanel.getTanks().values();
         int x, y;

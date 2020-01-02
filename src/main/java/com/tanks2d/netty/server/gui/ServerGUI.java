@@ -60,6 +60,10 @@ public class ServerGUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Process pressing button - "Stop Server"
+     * @param actionEvent
+     */
     private void stopServer(ActionEvent actionEvent) {
         statusLabel.setText("Server is stopping.....");
         try {
@@ -70,6 +74,10 @@ public class ServerGUI extends JFrame {
         System.exit(0);
     }
 
+    /**
+     * Process button - "Start server"
+     * @param actionEvent
+     */
     public void startServer(ActionEvent actionEvent) {
         startServerButton.setEnabled(false);
         statusLabel.setText("Server is running.....");
@@ -85,6 +93,10 @@ public class ServerGUI extends JFrame {
         }
     }
 
+    /**
+     * Main method of Server GUI
+     * @param args
+     */
     public static void main(String args[]) {
         new ServerGUI();
     }

@@ -31,6 +31,12 @@ public class Bomb {
     public boolean stop = false;
     private float velocityX = 0.05f, velocityY = 0.05f;
 
+    /**
+     * Constructor of Bomb
+     * @param x
+     * @param y
+     * @param direction
+     */
     public Bomb(int x, int y, int direction) {
         final SimpleSoundPlayer soundBoom = new SimpleSoundPlayer("/sounds/boom.wav");
         final InputStream streamBoom = new ByteArrayInputStream(soundBoom.getSamples());
@@ -62,22 +68,15 @@ public class Bomb {
         return yPosi;
     }
 
-    public void setPosiX(int x) {
-        xPosi = x;
-    }
-
-    public void setPosiY(int y) {
-        yPosi = y;
-    }
-
-    public BufferedImage getBomBufferdImg() {
+    public BufferedImage getBombBufferdImg() {
         return bombBuffImage;
     }
 
-    public BufferedImage getBombBuffImage() {
-        return bombBuffImage;
-    }
-
+    /**
+     * Check for collision (if bomb hit the target or not)
+     * @param starterName
+     * @return
+     */
     public boolean checkCollision(String starterName) {
         Collection<Tank> clientTanks = GameBoardPanel.getTanks().values();
         int x, y;
@@ -99,7 +98,11 @@ public class Bomb {
         return false;
     }
 
-
+    /**
+     * Running bomb in parallel with tank threads
+     * @param chekCollision
+     * @param starterName - name of tank, that fire
+     */
     public void startBombThread(boolean chekCollision, String starterName) {
         new BombShotThread(chekCollision, starterName).start();
     }
@@ -108,6 +111,11 @@ public class Bomb {
         private  boolean checkCollis;
         private String starterName;
 
+        /**
+         *
+         * @param chCollision
+         * @param starterName - name of tank, that fire
+         */
         public BombShotThread(boolean chCollision, String starterName) {
             this.checkCollis = chCollision;
             this.starterName = starterName;

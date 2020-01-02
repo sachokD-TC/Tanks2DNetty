@@ -2,7 +2,6 @@ package com.tanks2d.netty.client.gui;
 
 import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.entity.Tank;
-import com.tanks2d.netty.client.worker.GunLoader;
 import com.tanks2d.netty.client.worker.ParallelTasks;
 
 import javax.swing.*;
@@ -11,11 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
@@ -57,6 +52,7 @@ public class ClientGUI extends JFrame {
     int width = 990, height = 630;
     public GameBoardPanel boardPanel;
 
+
     public ClientGUI() {
         score = 0;
         this.setTitle(GAME_TITLE);
@@ -72,6 +68,10 @@ public class ClientGUI extends JFrame {
 
             }
 
+            /**
+             * Event on closing window
+             * @param e
+             */
             public void windowClosing(WindowEvent e) {
                 ClientGUI.this.windowClosing(e);
             }
@@ -242,11 +242,20 @@ public class ClientGUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     *  set gun panel not visible
+     */
     public void loadGun() {
         isGunLoaded.set(false);
         weaponPanel.setVisible(false);
     }
 
+    /**
+     *  Process registration
+     *  check for entering name
+     *  check for connection with server
+     *
+     */
     public void registerAction() {
         if (nameTextField.getText().equals("")) {
             JOptionPane.showMessageDialog(this, ENTER_NAME_MESSAGE, GAME_TITLE, JOptionPane.INFORMATION_MESSAGE);
@@ -279,6 +288,11 @@ public class ClientGUI extends JFrame {
         }
     }
 
+    /**
+     * change tip, and make possible chatting
+     * @param messageText - message to chat
+     * @param e
+     */
     private void sendMessageFromKeyboard(String messageText, KeyEvent e) {
         if (KeyEvent.VK_F2 == e.getKeyCode()) {
             setTipsText(TIP_PLAY_GAME_MESSAGE);
@@ -290,7 +304,10 @@ public class ClientGUI extends JFrame {
             sendMessageToChatLocal(messageText);
     }
 
-
+    /**
+     * send message to server
+     * @param messageText - message to chat
+     */
     private void sendMessageToChatLocal(String messageText) {
         if (!"".equals(messageText)) {
             client.sendCommandToServer(nameTextField.getText() + ":" + chatMessageTextField.getText() + "\n");
@@ -300,6 +317,10 @@ public class ClientGUI extends JFrame {
         }
     }
 
+    /**
+     * add message to text area of chat
+     * @param messageText - message to chat
+     */
     public void sendMessageToServerChat(String messageText) {
         if (!"".equals(messageText)) {
             chatTextArea.append(messageText);
@@ -307,17 +328,29 @@ public class ClientGUI extends JFrame {
         }
     }
 
+    /**
+     *  set focus for chat window
+     */
     public void activateChat() {
         chatMessageTextField.setFocusable(true);
         chatMessageTextField.setRequestFocusEnabled(true);
         chatMessageTextField.grabFocus();
     }
 
+    /**
+     * setter for client score and label of it
+     * @param scoreInt - score of client Tank
+     */
     public static void setScore(int scoreInt) {
         score += scoreInt;
         scoreLabel.setText("Score : " + score);
     }
 
+    /**
+     * Event on closing window - show confirm dialog - are you sure..
+     * send command to server - exit
+     * @param e
+     */
     public void windowClosing(WindowEvent e) {
         int response = JOptionPane.showConfirmDialog(this, EXIT_QUESTION_MESSAGE, GAME_TITLE, JOptionPane.YES_NO_OPTION);
         if (response == JOptionPane.YES_OPTION) {
@@ -328,22 +361,26 @@ public class ClientGUI extends JFrame {
         }
     }
 
-
+    /**
+     *
+     * @return - instance of SecureClient
+     */
     public SecureClient getClient() {
         return client;
     }
 
     public static void main(String[] args) {
         new ClientGUI();
-
+        // Task in parallel - wait 5 sec while gun loaded
+        // should be 2 threads -
+        // 1 - GUI of client
+        // 2 - wait for loading gun
         ParallelTasks tasks = new ParallelTasks();
-        final Runnable waitFiveSecond = new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                    isGunLoaded.set(true);
-                } catch (InterruptedException e) {
-                }
+        final Runnable waitFiveSecond = () -> {
+            try {
+                Thread.sleep(5000);
+                isGunLoaded.set(true);
+            } catch (InterruptedException e) {
             }
         };
 
@@ -359,27 +396,50 @@ public class ClientGUI extends JFrame {
         }
     }
 
+    /**
+     *
+     * @return - client Tank
+     */
     public Tank getClientTank() {
         return clientTank;
     }
 
+    /**
+     * Set tip for tip bar
+     * @param tip - string value of tip, that should be shown
+     */
     public void setTipsText(String tip) {
         gameTipsLabel.setText(tip);
     }
 
+    /**
+     * Update text area, where Room scores show
+     * @param scores - room scores
+     */
     public void updateRoomScores(String scores) {
         roomScoresTextArea.setText(scores);
     }
 
+    /**
+     *
+     * @return return true if gun loaded
+     */
     public AtomicBoolean isGunLoaded() {
         return isGunLoaded;
     }
 
+    /**
+     * setter for thread save value - isGunLoaded
+     * @param isGunLoaded
+     */
     public void setIsGunLoaded(boolean isGunLoaded) {
         this.isGunLoaded.set(isGunLoaded);
     }
 
-    public void setGunLoaded() {
+    /**
+     * Set visible to gun loaded bar
+     */
+    public void setGunLoadedInPanel() {
         weaponPanel.setVisible(true);
     }
 }
