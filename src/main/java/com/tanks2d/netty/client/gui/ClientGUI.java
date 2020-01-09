@@ -52,6 +52,7 @@ public class ClientGUI extends JFrame {
 
     int width = 990, height = 630;
     public GameBoardPanel boardPanel;
+    public static final int MAX_BULLET_NUMBER = 100;
 
 
     public ClientGUI(int maxBulletNumber) {
@@ -415,10 +416,9 @@ public class ClientGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        int maxBulletNumber = 4;
         int timeToWait = 5000;
-        new ClientGUI(maxBulletNumber);
-        runWaiterForBullet(timeToWait, maxBulletNumber);
+        new ClientGUI(MAX_BULLET_NUMBER);
+        runWaiterForBullet(timeToWait, MAX_BULLET_NUMBER);
     }
 
     public static void runWaiterForBullet(int timeToWait, int maxBulletNumber){
