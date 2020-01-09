@@ -17,6 +17,8 @@ package com.tanks2d.netty.client;
 
 import com.tanks2d.netty.client.entity.Tank;
 import com.tanks2d.netty.client.gui.ClientGUI;
+import com.tanks2d.netty.server.entity.Score;
+import com.tanks2d.netty.server.entity.ScorePerRoom;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -34,15 +36,15 @@ import static com.tanks2d.netty.client.utils.constants.Commands.*;
 
 public final class SecureClient {
 
-    private Channel ch;
+    private Channel channel;
     private EventLoopGroup group;
     private static SecureClient client;
     private ClientGUI clientGUI;
+    private SecureClientInitializer secureClientInitializer = null;
 
     /**
-     *
-     * @param host - ip or DNS name for server
-     * @param port - port to connect with server
+     * @param host      - ip or DNS name for server
+     * @param port      - port to connect with server
      * @param clientGUI - client Graphic interface
      * @throws SSLException
      * @throws InterruptedException
@@ -53,15 +55,15 @@ public final class SecureClient {
 
         group = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
+        secureClientInitializer = new SecureClientInitializer(sslCtx, host, port);
         b.group(group)
                 .channel(NioSocketChannel.class)
-                .handler(new SecureClientInitializer(sslCtx, host, port));
-        this.ch = b.connect(host, port).sync().channel();
+                .handler(secureClientInitializer);
+        this.channel = b.connect(host, port).sync().channel();
         this.clientGUI = clientGUI;
     }
 
     /**
-     *
      * @return instasnce of SecureClient
      */
     public static SecureClient getClient() {
@@ -69,14 +71,24 @@ public final class SecureClient {
     }
 
     /**
+     * need it for auto tests
+     */
+    public static void disposeClient() {
+        System.out.println("dispose client");
+        client = null;
+    }
+
+    /**
      * make client variable singleton - if it's null - return new instance
      * if not - return already created one.
-     * @param host - ip or DNS name for server
-     * @param port - port to connect with server
+     *
+     * @param host      - ip or DNS name for server
+     * @param port      - port to connect with server
      * @param clientGUI - client Graphic interface
      * @return
      */
     public static SecureClient getClient(String host, int port, ClientGUI clientGUI) {
+        System.out.println("get Client = " + client);
         if (client == null) {
             try {
                 client = new SecureClient(host, port, clientGUI);
@@ -120,6 +132,7 @@ public final class SecureClient {
 
     /**
      * update tank position
+     *
      * @param command - special string command delimited with comma
      */
     public void updateTank(String command) {
@@ -133,6 +146,7 @@ public final class SecureClient {
 
     /**
      * Register new tank on board
+     *
      * @param command - special string command delimited with comma
      */
     public void registerTank(String command) {
@@ -166,14 +180,18 @@ public final class SecureClient {
 
     /**
      * process exit command
+     *
      * @param command - special string command delimited with comma
      */
     public void exitTank(String command) {
+        String[] params = command.split(",");
+        ScorePerRoom.removeTankScore(secureClientInitializer.getSecureClientMessageHandler().getRoomId(), params[1]);
         removeTank(command);
     }
 
     /**
      * Process removing command (in case of death of tank)
+     *
      * @param command - special string command delimited with comma
      */
     public void removeTank(String command) {
@@ -185,10 +203,11 @@ public final class SecureClient {
 
     /**
      * send message to secure channel
+     *
      * @param command - special string command delimited with comma
      */
     public void sendCommandToServer(String command) {
-        ch.writeAndFlush(SecureClientMessageHandler.roomId + "#" + command + "\r\n");
+        channel.writeAndFlush(secureClientInitializer.getSecureClientMessageHandler().getRoomId() + "#" + command + "\r\n");
     }
 
     public void closeConnection() {
@@ -197,6 +216,7 @@ public final class SecureClient {
 
     /**
      * Process shot command
+     *
      * @param command - special string command delimited with comma
      */
     public void shot(String command) {
@@ -208,6 +228,7 @@ public final class SecureClient {
 
     /**
      * Process send to chat command
+     *
      * @param command - special string command delimited with semi column
      */
     public void sendMessageToChat(String command) {
@@ -217,16 +238,27 @@ public final class SecureClient {
         }
     }
 
+    /**
+     * @return - clientGUI
+     */
     public ClientGUI getClientGUI() {
         return clientGUI;
     }
 
     /**
+     * @return - clientInitializer
+     */
+    public SecureClientInitializer getSecureClientInitializer() {
+        return secureClientInitializer;
+    }
+
+    /**
      * Update room scores
+     *
      * @param command - special string command delimited with & sign
      */
     public void processScores(String command) {
-        command = command.substring(command.indexOf(SCORES) + SCORES.length()).replace("&","\n");
+        command = command.substring(command.indexOf(SCORES) + SCORES.length()).replace("&", "\n");
         clientGUI.updateRoomScores(command);
     }
 

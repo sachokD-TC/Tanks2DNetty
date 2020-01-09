@@ -24,6 +24,8 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.ssl.SslContext;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Creates a newly configured {@link ChannelPipeline} for a new channel.
  */
@@ -31,7 +33,8 @@ public class SecureServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
     private final int numbetOfTanks;
-
+    private SecureServerMessageHandler secureServerMessageHandler;
+    public static AtomicBoolean isSomeoneRegistered = new AtomicBoolean(false);
     public SecureServerInitializer(SslContext sslCtx, int numbetOfTanks) {
         this.sslCtx = sslCtx;
         this.numbetOfTanks = numbetOfTanks;
@@ -54,6 +57,11 @@ public class SecureServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new StringEncoder());
 
         // and then business logic.
-        pipeline.addLast(new SecureServerMessageHandler(this.numbetOfTanks));
+        secureServerMessageHandler = new SecureServerMessageHandler(this.numbetOfTanks);
+        pipeline.addLast(secureServerMessageHandler);
+    }
+
+    public SecureServerMessageHandler secureServerMessageHandler(){
+        return secureServerMessageHandler;
     }
 }

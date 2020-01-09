@@ -101,9 +101,10 @@ public class GameBoardPanel extends JPanel {
         } else {
             if (!name.equals(this.clientTank.getTankName())) {
                 Tank tank = tanks.get(name);
-                tank.setXpoistion(x);
+                tank.setXposition(x);
                 tank.setYposition(y);
                 tank.setDirection(direction);
+                System.out.println(tank.getTankName() + " position " + tank.getYposition());
                 repaint();
             }
         }

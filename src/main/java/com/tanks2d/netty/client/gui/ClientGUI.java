@@ -3,12 +3,14 @@ package com.tanks2d.netty.client.gui;
 import com.tanks2d.netty.client.SecureClient;
 import com.tanks2d.netty.client.entity.Tank;
 import com.tanks2d.netty.client.worker.ParallelTasks;
+import com.tanks2d.netty.server.SecureServer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.tanks2d.netty.client.utils.constants.Commands.DELIMITER;
 import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
@@ -40,18 +42,21 @@ public class ClientGUI extends JFrame {
     private JProgressBar weaponProgressBar;
     private JLabel roomScoresLabel;
     private JLabel weaponLabel;
+    private JLabel bulletsNumberLabel;
     private JTextArea roomScoresTextArea;
     private SecureClient client;
     private Tank clientTank;
     private static int score;
     public static AtomicBoolean isGunLoaded = new AtomicBoolean(true);
+    public static AtomicInteger bulletNumber = new AtomicInteger(100);
 
     int width = 990, height = 630;
     public GameBoardPanel boardPanel;
 
 
-    public ClientGUI() {
+    public ClientGUI(int maxBulletNumber) {
         score = 0;
+        bulletNumber.set(maxBulletNumber);
         this.setTitle(GAME_TITLE);
         this.setSize(width, height);
         this.setLocation(60, 100);
@@ -162,6 +167,9 @@ public class ClientGUI extends JFrame {
         weaponProgressBar.setStringPainted(true);
         weaponProgressBar.setValue(100);
         weaponPanel.setBounds(10, 270, 180, 20);
+        bulletsNumberLabel = new JLabel("" + bulletNumber.get());
+        bulletsNumberLabel.setBounds(10, 270, 180, 20);
+        weaponPanel.add(bulletsNumberLabel);
         roomScoresAndWeaponPanel.add(weaponPanel);
 
         hostTextField = new JTextField("localhost");
@@ -256,6 +264,11 @@ public class ClientGUI extends JFrame {
     public void loadGun() {
         isGunLoaded.set(false);
         weaponPanel.setVisible(false);
+        bulletNumber.getAndDecrement();
+        if (bulletNumber.get() == 0) {
+            JOptionPane.showMessageDialog(this, GAMEOVER_MESSAGE, GAMEOVER_TITLE, JOptionPane.INFORMATION_MESSAGE);
+            exitGame();
+        }
     }
 
     /**
@@ -265,14 +278,14 @@ public class ClientGUI extends JFrame {
      */
     public void registerAction() {
         if (hostTextField.getText().equals("")) {
-            JOptionPane.showMessageDialog(this, HOST_EMPTY_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, HOST_EMPTY_MESSAGE, ALERT_TITLE, JOptionPane.WARNING_MESSAGE);
         } else if (portTextField.getText().equals("")) {
-            JOptionPane.showMessageDialog(this, PORT_EMPTY_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, PORT_EMPTY_MESSAGE, ALERT_TITLE, JOptionPane.WARNING_MESSAGE);
         } else if (nameTextField.getText().equals("")) {
-            JOptionPane.showMessageDialog(this, ENTER_NAME_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, ENTER_NAME_MESSAGE, ALERT_TITLE, JOptionPane.WARNING_MESSAGE);
         } else {
             if (!portTextField.getText().matches("^[0-9]+$")) {
-                JOptionPane.showMessageDialog(this, PORT_NOT_CORRECT_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, PORT_NOT_CORRECT_MESSAGE, ALERT_TITLE, JOptionPane.WARNING_MESSAGE);
             } else {
                 connectToServer();
             }
@@ -280,7 +293,7 @@ public class ClientGUI extends JFrame {
     }
 
     /**
-     *  connect to server after checks
+     * connect to server after checks
      */
     private void connectToServer() {
         nameLabel.setText(NAME_LABEL_TEXT + nameTextField.getText());
@@ -304,9 +317,13 @@ public class ClientGUI extends JFrame {
             boardPanel.setFocusable(true);
             boardPanel.grabFocus();
         } else {
-            JOptionPane.showMessageDialog(this, SERVER_NOT_RUNNING_MESSAGE, ALERT_TITLE, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, SERVER_NOT_RUNNING_MESSAGE, ALERT_TITLE, JOptionPane.WARNING_MESSAGE);
             registerButton.setEnabled(true);
         }
+    }
+
+    public void disconnect() {
+        SecureClient.disposeClient();
     }
 
     /**
@@ -380,11 +397,14 @@ public class ClientGUI extends JFrame {
     public void windowClosing(WindowEvent e) {
         int response = JOptionPane.showConfirmDialog(this, EXIT_QUESTION_MESSAGE, EXIT_MESSAGE_TITLE, JOptionPane.YES_NO_OPTION);
         if (response == JOptionPane.YES_OPTION) {
-            if (SecureClient.getClient() != null)
-                SecureClient.getClient().sendCommandToServer(EXIT + DELIMITER + clientTank.getTankName() + DELIMITER + "-");
-            this.dispose();
-            System.exit(0);
+            exitGame();
         }
+    }
+
+    private void exitGame() {
+        if (SecureClient.getClient() != null)
+            SecureClient.getClient().sendCommandToServer(EXIT + DELIMITER + clientTank.getTankName() + DELIMITER + "-");
+        this.dispose();
     }
 
     /**
@@ -395,7 +415,13 @@ public class ClientGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        new ClientGUI();
+        int maxBulletNumber = 4;
+        int timeToWait = 5000;
+        new ClientGUI(maxBulletNumber);
+        runWaiterForBullet(timeToWait, maxBulletNumber);
+    }
+
+    public static void runWaiterForBullet(int timeToWait, int maxBulletNumber){
         // Task in parallel - wait 5 sec while gun loaded
         // should be 2 threads -
         // 1 - GUI of client
@@ -403,7 +429,7 @@ public class ClientGUI extends JFrame {
         ParallelTasks tasks = new ParallelTasks();
         final Runnable waitFiveSecond = () -> {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(timeToWait);
                 isGunLoaded.set(true);
             } catch (InterruptedException e) {
             }
@@ -411,7 +437,7 @@ public class ClientGUI extends JFrame {
 
         tasks.add(waitFiveSecond);
         try {
-            for (int i = 0; i != 100; i++) {
+            for (int i = 0; i != maxBulletNumber; i++) {
                 while (isGunLoaded.get()) {
                 }
                 tasks.go();
@@ -443,6 +469,7 @@ public class ClientGUI extends JFrame {
      * @param scores - room scores
      */
     public void updateRoomScores(String scores) {
+        System.out.println("scores upating - " + scores);
         roomScoresTextArea.setText(scores);
     }
 
@@ -467,6 +494,8 @@ public class ClientGUI extends JFrame {
      */
     public void setGunLoadedInPanel() {
         weaponPanel.setVisible(true);
+        bulletsNumberLabel.setText("" + bulletNumber.get());
+        bulletsNumberLabel.repaint();
     }
 
     /**
@@ -497,5 +526,25 @@ public class ClientGUI extends JFrame {
         return portTextField;
     }
 
+    /**
+     * @return - game tips label for FEST Swing testing
+     */
+    public JLabel getGameTipsLabel() {
+        return gameTipsLabel;
+    }
+
+    /**
+     * @return - game chatArea for FEST Swing testing
+     */
+    public JTextArea getChatTextArea() {
+        return chatTextArea;
+    }
+
+    /**
+     * @return - text area form FEST Swing testing
+     */
+    public JTextArea getRoomScoresTextArea() {
+        return roomScoresTextArea;
+    }
 
 }

@@ -27,11 +27,10 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tanks2d.netty.client.utils.constants.Commands.EXIT;
+import static com.tanks2d.netty.server.SecureServerInitializer.isSomeoneRegistered;
 
 /**
  * Handles a server-side channel.
@@ -40,6 +39,10 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
 
     static final Map<Integer, ChannelGroup> channelsMap = new HashMap<>();
     static final Map<String, String> namesMap = new HashMap<>();
+    private static final String REGISTER = "Register";
+    private static final String REMOVE = "Remove";
+    private static final String EXIT = "Exit";
+    private static final String SCORES_$ = "Scores$";
     private int numberOfTanks;
 
     public SecureServerMessageHandler(int numberOfTanks) {
@@ -48,6 +51,13 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+
+    }
+
+    @Override
+    public void channelActive(final ChannelHandlerContext ctx) {
+        if (!isSomeoneRegistered.get())
+            isSomeoneRegistered.set(true);
         ctx.pipeline().get(SslHandler.class).handshakeFuture().addListener(
                 (GenericFutureListener<Future<Channel>>) future -> {
                     ChannelGroup channels;
@@ -56,28 +66,24 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                         channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
                         roomId++;
                         channels.add(ctx.channel());
-                        ctx.writeAndFlush(roomId + "#player joined \n");
+                        ctx.writeAndFlush(roomId + "#player joined one \n");
                         namesMap.put(ctx.channel().id().asLongText(), "");
                         channelsMap.put(roomId, channels);
                     } else {
                         channels = channelsMap.get(roomId);
-                        if (channels.size() - 1 >= numberOfTanks) {
+                        if (channels != null && channels.size() - 1 >= numberOfTanks) {
                             roomId++;
                             channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
                             ctx.writeAndFlush(roomId + "#new room opened \n");
                         }
                     }
-                    if (!channels.contains(ctx.channel())) {
+                    if (channels != null && !channels.contains(ctx.channel())) {
                         channels.add(ctx.channel());
-                        ctx.writeAndFlush(roomId + "#player joined \n");
+                        ctx.writeAndFlush(roomId + "#player joined two \n");
                         namesMap.put(ctx.channel().id().asLongText(), "");
                         channelsMap.put(roomId, channels);
                     }
                 });
-    }
-
-    @Override
-    public void channelActive(final ChannelHandlerContext ctx) {
     }
 
     @Override
@@ -92,14 +98,13 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                     name = getNameFromRegisterCommand(msg, channelId);
                     namesMap.put(ctx.channel().id().asLongText(), name);
                 }
-                sendMessageToRoom(roomId, msg, name, ctx);
+                sendMessageToRoom(roomId, msg, name);
                 if (msg.contains("Register") || msg.contains("Remove")) {
-                    processScoreCommand(roomId, msg, ctx);
+                    processCommand(roomId, msg, ctx);
                 }
-
                 if (msg.contains("Exit")) {
-                    processScoreCommand(roomId, msg, ctx);
-                    sendMessageToRoom(roomId, name + " left the room # " + roomId, name, ctx);
+                    processCommand(roomId, msg, ctx);
+                    sendMessageToRoom(roomId, name + " left the room # " + roomId, name);
                     channelsMap.remove(ctx.channel());
                     namesMap.remove(channelId);
                     ctx.close();
@@ -109,18 +114,18 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
     }
 
 
-    private void processScoreCommand(Integer roomId, String msg, ChannelHandlerContext ctx) {
+    private void processCommand(Integer roomId, String msg, ChannelHandlerContext ctx) {
         String name = msg.split(",")[1];
-        if (msg.contains("Register")) {
+        if (msg.contains(REGISTER)) {
             processRegisterCommand(roomId, name);
-        } else if (msg.contains("Remove")) {
+        } else if (msg.contains(REMOVE)) {
             String killerName = msg.split(",")[2];
             processRemoveCommand(roomId, killerName);
-        } else if (msg.contains("Exit")) {
+        } else if (msg.contains(EXIT)) {
             processExitCommand(roomId, name);
         }
-        msg = roomId + "#" + "Scores$" + ScorePerRoom.getRoomScores(roomId);
-        sendMessageToRoom(roomId, msg, name, ctx);
+        msg = roomId + "#" + SCORES_$ + ScorePerRoom.getRoomScores(roomId);
+        sendMessageToRoom(roomId, msg, name);
     }
 
     private void processExitCommand(Integer roomId, String name) {
@@ -154,7 +159,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
         }
     }
 
-    private void sendMessageToRoom(Integer roomId, String message, String name, ChannelHandlerContext ctx) {
+    public void sendMessageToRoom(Integer roomId, String message, String name) {
         ChannelGroup channels = channelsMap.get(roomId);
         System.out.println("command - " + message + ", name - " + name);
         for (Channel c : channels) {

@@ -24,23 +24,28 @@ import static com.tanks2d.netty.client.utils.constants.Commands.*;
  * Handles a client-side channel.
  */
 public class SecureClientMessageHandler extends SimpleChannelInboundHandler<String> {
-    public static int roomId;
+    public static final String NAME_END_SIGN = "]";
+    private int roomId;
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        if (msg.contains(ROOM_NUMBER_SIGN) && roomId == 0) {
-            roomId = Integer.parseInt(msg.substring(0, msg.indexOf(ROOM_NUMBER_SIGN)));
-        } else {
-            msg = ROOM_NUMBER_SIGN + roomId + msg;
+        if (msg.contains(ROOM_NUMBER_SIGN)) {
+            try {
+                System.out.println(msg);
+                if(msg.contains(NAME_END_SIGN))
+                    roomId = Integer.parseInt(msg.substring(msg.indexOf(NAME_END_SIGN) +1, msg.indexOf(ROOM_NUMBER_SIGN)));
+                else
+                    roomId = Integer.parseInt(msg.substring(0, msg.indexOf(ROOM_NUMBER_SIGN)));
+                if (msg.contains(UPDATE)) SecureClient.getClient().updateTank(msg);
+                else if (msg.contains(SCORES + SCORES_DELIMITER)) SecureClient.getClient().processScores(msg);
+                else if (msg.contains(REMOVE)) SecureClient.getClient().removeTank(msg);
+                else if (msg.contains(EXIT)) SecureClient.getClient().exitTank(msg);
+                else if (msg.contains(SHOT)) SecureClient.getClient().shot(msg);
+                else if (msg.contains(CHAT_DELIMITER)) SecureClient.getClient().sendMessageToChat(msg);
+            } catch (NumberFormatException num){
+                System.out.println("Wrong room number " + num);
+            }
         }
-        System.out.println(msg);
-
-        if (msg.contains(UPDATE)) SecureClient.getClient().updateTank(msg);
-        else if(msg.contains(SCORES + SCORES_DELIMITER)) SecureClient.getClient().processScores(msg);
-        else if (msg.contains(REMOVE)) SecureClient.getClient().removeTank(msg);
-        else if (msg.contains(EXIT)) SecureClient.getClient().exitTank(msg);
-        else if (msg.contains(SHOT)) SecureClient.getClient().shot(msg);
-        else if (msg.contains(CHAT_DELIMITER)) SecureClient.getClient().sendMessageToChat(msg);
     }
 
 
@@ -48,5 +53,9 @@ public class SecureClientMessageHandler extends SimpleChannelInboundHandler<Stri
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    public int getRoomId() {
+        return roomId;
     }
 }

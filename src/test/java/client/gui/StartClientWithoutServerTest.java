@@ -15,11 +15,12 @@ import static org.junit.Assert.assertTrue;
 
 public class StartClientWithoutServerTest {
 
+    private static final int MAX_BULLET_NUMBER = 3;
     private ClientGUI clientGUI;
 
     @Before
     public void setUp() {
-        clientGUI = new ClientGUI();
+        clientGUI = new ClientGUI(MAX_BULLET_NUMBER);
     }
 
     @After
@@ -128,6 +129,7 @@ public class StartClientWithoutServerTest {
                 Thread.sleep(1000);
                 JDialog frame = waitForJOptionPaneDialog(ALERT_TITLE, PORT_EMPTY_MESSAGE);
                 if (frame != null) {
+                    assertTrue(true);
                     frame.dispose();
                 }
             } catch (InterruptedException e) {
@@ -151,6 +153,7 @@ public class StartClientWithoutServerTest {
                 JDialog frame = waitForJOptionPaneDialog(ALERT_TITLE, PORT_NOT_CORRECT_MESSAGE);
                 if (frame != null) {
                     frame.dispose();
+                    assertTrue(true);
                 }
             } catch (InterruptedException e) {
             }

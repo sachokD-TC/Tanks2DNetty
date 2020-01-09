@@ -12,6 +12,7 @@ public class ScorePerRoom {
      * as map -
      * keys - roomId
      * values - map of scores - keys names, values - scores
+     *
      * @param roomId - number of room
      * @return
      */
@@ -25,5 +26,16 @@ public class ScorePerRoom {
             return scores.toString();
         }
         return "";
+    }
+
+    /**
+     *
+     * @param roomId - id of room
+     * @param tankName - tank to remove
+     */
+    public static void removeTankScore(Integer roomId, String tankName) {
+        Map<String, Score> scoresMap = scorePerRoomMap.get(roomId);
+        if (scoresMap != null && scoresMap.containsKey(tankName))
+            scoresMap.remove(tankName);
     }
 }

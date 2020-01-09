@@ -15,7 +15,9 @@
  */
 package com.tanks2d.netty.server;
 
+import com.tanks2d.netty.server.entity.ScorePerRoom;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -33,10 +35,14 @@ public final class SecureServer implements Runnable {
 
     private final int port;
     private final int numbetOfTanks;
+    private SecureServerInitializer secureServerInitializer;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
 
     /**
      * Server constructor
-     * @param port - port for connection
+     *
+     * @param port          - port for connection
      * @param numberOfTanks - max number of tanks in one room
      * @throws CertificateException
      * @throws SSLException
@@ -61,21 +67,43 @@ public final class SecureServer implements Runnable {
         } catch (SSLException e) {
             e.printStackTrace();
         }
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
+            secureServerInitializer = new SecureServerInitializer(sslCtx, numbetOfTanks);
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new SecureServerInitializer(sslCtx, numbetOfTanks));
-
+                    .childHandler(secureServerInitializer);
             b.bind(port).sync().channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+            shutdownServer();
+        }
+    }
+
+    /**
+     * @param roomId - room id
+     * @param message - message to send
+     * @param name - name of sender
+     */
+    public void sendCommandToRoom(Integer roomId, String message, String name) {
+        secureServerInitializer.secureServerMessageHandler().sendMessageToRoom(roomId, message, name);
+    }
+
+    public void shutdownServer() {
+        if (bossGroup != null && workerGroup != null) {
+            try {
+                bossGroup.shutdownGracefully().sync();
+                workerGroup.shutdownGracefully().sync();
+                SecureServerMessageHandler.channelsMap.clear();
+                SecureServerMessageHandler.namesMap.clear();
+                ScorePerRoom.scorePerRoomMap.clear();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

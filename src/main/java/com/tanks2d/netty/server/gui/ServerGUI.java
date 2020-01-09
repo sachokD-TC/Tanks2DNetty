@@ -1,6 +1,7 @@
 package com.tanks2d.netty.server.gui;
 
 import com.tanks2d.netty.server.SecureServer;
+import com.tanks2d.netty.server.SecureServerInitializer;
 
 import javax.net.ssl.SSLException;
 import javax.swing.*;
@@ -16,7 +17,8 @@ public class ServerGUI extends JFrame {
     private JTextField numberOfTanksPerRoomTextField;
     private JLabel portLabel;
     private JTextField portTextField;
-
+    private SecureServer secureServer;
+    private Thread thread;
 
     public ServerGUI() {
         setTitle("Tanks 2D Server");
@@ -62,20 +64,19 @@ public class ServerGUI extends JFrame {
 
     /**
      * Process pressing button - "Stop Server"
+     *
      * @param actionEvent
      */
     private void stopServer(ActionEvent actionEvent) {
         statusLabel.setText("Server is stopping.....");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-        System.exit(0);
+        SecureServerInitializer.isSomeoneRegistered.set(false);
+        secureServer.shutdownServer();
+        this.dispose();
     }
 
     /**
      * Process button - "Start server"
+     *
      * @param actionEvent
      */
     public void startServer(ActionEvent actionEvent) {
@@ -84,7 +85,8 @@ public class ServerGUI extends JFrame {
         statusLabel.repaint();
         try {
             int numberOfTanks = Integer.parseInt(numberOfTanksPerRoomTextField.getText());
-            Thread thread = new Thread(new SecureServer(Integer.parseInt(portTextField.getText()), numberOfTanks));
+            secureServer = new SecureServer(Integer.parseInt(portTextField.getText()), numberOfTanks);
+            thread = new Thread(secureServer);
             thread.start();
         } catch (CertificateException ex) {
             ex.printStackTrace();
@@ -94,7 +96,16 @@ public class ServerGUI extends JFrame {
     }
 
     /**
+     *
+     * @return - secure Server for auto tests
+     */
+    public SecureServer getSecureServer() {
+        return secureServer;
+    }
+
+    /**
      * Main method of Server GUI
+     *
      * @param args
      */
     public static void main(String args[]) {
@@ -102,7 +113,6 @@ public class ServerGUI extends JFrame {
     }
 
     /**
-     *
      * @return button instance for FEST Swing tests
      */
     public JButton getStartServerButton() {
@@ -110,7 +120,6 @@ public class ServerGUI extends JFrame {
     }
 
     /**
-     *
      * @return button instance for FEST Swing tests
      */
     public JButton getStopServerButton() {

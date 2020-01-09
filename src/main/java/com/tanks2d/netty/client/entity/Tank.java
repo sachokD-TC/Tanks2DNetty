@@ -80,7 +80,7 @@ public class Tank {
         return posiY;
     }
 
-    public void setXpoistion(int x) {
+    public void setXposition(int x) {
         posiX = x;
     }
 
