@@ -85,9 +85,9 @@ public final class SecureServer implements Runnable {
     }
 
     /**
-     * @param roomId - room id
+     * @param roomId  - room id
      * @param message - message to send
-     * @param name - name of sender
+     * @param name    - name of sender
      */
     public void sendCommandToRoom(Integer roomId, String message, String name) {
         secureServerInitializer.secureServerMessageHandler().sendMessageToRoom(roomId, message, name);
