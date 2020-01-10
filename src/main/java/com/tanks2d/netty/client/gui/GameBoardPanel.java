@@ -104,7 +104,6 @@ public class GameBoardPanel extends JPanel {
                 tank.setXposition(x);
                 tank.setYposition(y);
                 tank.setDirection(direction);
-                System.out.println(tank.getTankName() + " position " + tank.getYposition());
                 repaint();
             }
         }

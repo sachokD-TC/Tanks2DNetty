@@ -29,7 +29,7 @@ public class SecureClientMessageHandler extends SimpleChannelInboundHandler<Stri
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        if (msg.contains(ROOM_NUMBER_SIGN)) {
+        if (msg.contains(ROOM_NUMBER_SIGN) && SecureClient.getClient() != null) {
             try {
                 System.out.println(msg);
                 if(msg.contains(NAME_END_SIGN))

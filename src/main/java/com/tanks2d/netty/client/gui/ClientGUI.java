@@ -18,6 +18,11 @@ import static com.tanks2d.netty.client.utils.constants.Messages.*;
 
 public class ClientGUI extends JFrame {
 
+    public static final int MAX_BULLET_NUMBER = 100;
+    public static boolean isStop = false;
+    public static AtomicBoolean isGunLoaded = new AtomicBoolean(true);
+    public static AtomicInteger bulletNumber = new AtomicInteger(100);
+
     private static final String NAME_LABEL_TEXT = "Name:";
     private static final String SEND_MESSAGE = "Send message";
     private final JLabel nameLabel;
@@ -47,12 +52,8 @@ public class ClientGUI extends JFrame {
     private SecureClient client;
     private Tank clientTank;
     private static int score;
-    public static AtomicBoolean isGunLoaded = new AtomicBoolean(true);
-    public static AtomicInteger bulletNumber = new AtomicInteger(100);
-
     int width = 990, height = 630;
     public GameBoardPanel boardPanel;
-    public static final int MAX_BULLET_NUMBER = 100;
 
 
     public ClientGUI(int maxBulletNumber) {
@@ -324,6 +325,7 @@ public class ClientGUI extends JFrame {
     }
 
     public void disconnect() {
+        ClientGUI.isStop = true;
         SecureClient.disposeClient();
     }
 
@@ -405,6 +407,7 @@ public class ClientGUI extends JFrame {
     private void exitGame() {
         if (SecureClient.getClient() != null)
             SecureClient.getClient().sendCommandToServer(EXIT + DELIMITER + clientTank.getTankName() + DELIMITER + "-");
+        this.disconnect();
         this.dispose();
     }
 
@@ -421,7 +424,7 @@ public class ClientGUI extends JFrame {
         runWaiterForBullet(timeToWait, MAX_BULLET_NUMBER);
     }
 
-    public static void runWaiterForBullet(int timeToWait, int maxBulletNumber){
+    public static void runWaiterForBullet(int timeToWait, int maxBulletNumber) {
         // Task in parallel - wait 5 sec while gun loaded
         // should be 2 threads -
         // 1 - GUI of client
@@ -439,6 +442,7 @@ public class ClientGUI extends JFrame {
         try {
             for (int i = 0; i != maxBulletNumber; i++) {
                 while (isGunLoaded.get()) {
+                    if (isStop) System.exit(0);
                 }
                 tasks.go();
             }

@@ -104,7 +104,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
                 }
                 if (msg.contains("Exit")) {
                     processCommand(roomId, msg, ctx);
-                    sendMessageToRoom(roomId, name + " left the room # " + roomId, name);
+                    sendMessageToRoom(roomId, roomId + "#" + name + " left the room # " + roomId, name);
                     channelsMap.remove(ctx.channel());
                     namesMap.remove(channelId);
                     ctx.close();
@@ -122,6 +122,7 @@ public class SecureServerMessageHandler extends SimpleChannelInboundHandler<Stri
             String killerName = msg.split(",")[2];
             processRemoveCommand(roomId, killerName);
         } else if (msg.contains(EXIT)) {
+            ScorePerRoom.removeTankScore(roomId, name);
             processExitCommand(roomId, name);
         }
         msg = roomId + "#" + SCORES_$ + ScorePerRoom.getRoomScores(roomId);

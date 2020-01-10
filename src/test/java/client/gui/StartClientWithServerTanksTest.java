@@ -136,7 +136,6 @@ public class StartClientWithServerTanksTest {
                 Thread.sleep(10);
                 JDialog frame = waitForJOptionPaneDialog(GAMEOVER_TITLE, GAMEOVER_MESSAGE);
                 if (frame != null) {
-                    System.out.println(" frame is here");
                     frame.dispose();
                     assertTrue(true);
                 }

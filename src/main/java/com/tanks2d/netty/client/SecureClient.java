@@ -17,7 +17,6 @@ package com.tanks2d.netty.client;
 
 import com.tanks2d.netty.client.entity.Tank;
 import com.tanks2d.netty.client.gui.ClientGUI;
-import com.tanks2d.netty.server.entity.Score;
 import com.tanks2d.netty.server.entity.ScorePerRoom;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -185,7 +184,6 @@ public final class SecureClient {
      */
     public void exitTank(String command) {
         String[] params = command.split(",");
-        ScorePerRoom.removeTankScore(secureClientInitializer.getSecureClientMessageHandler().getRoomId(), params[1]);
         removeTank(command);
     }
 
